@@ -277,4 +277,21 @@ public class WorkOrder {
     	throw new UnsupportedOperationException("Not implemented yet");
     }
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(date, vehicle);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		WorkOrder other = (WorkOrder) obj;
+		return Objects.equals(date, other.date) && Objects.equals(vehicle, other.vehicle);
+	}
+
 }

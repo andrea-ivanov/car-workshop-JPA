@@ -53,12 +53,12 @@ public class Invoice {
 	
 	public Invoice(long number) {
 		// call full constructor with sensible defaults
-		throw new UnsupportedOperationException("Not implemented yet");
+		this(number, LocalDate.now(), List.of());
 	}
 
 	public Invoice(long number, LocalDate date) {
 		// call full constructor with sensible defaults
-		throw new UnsupportedOperationException("Not implemented yet");
+		this(number, date, List.of());
 	}
 
 	public Invoice(long number, List<WorkOrder> workOrders) {
@@ -69,7 +69,44 @@ public class Invoice {
 		// check arguments (always), through IllegalArgumentException
 		// store the number
 		// add every work order calling addWorkOrder( w )
-		throw new UnsupportedOperationException("Not implemented yet");
+		ArgumentChecks.isTrue(number >= 0, "Invoice number must be positive");
+		ArgumentChecks.isNotNull(date, "Invoice date cannot be null");
+		ArgumentChecks.isNotNull(workOrders, "Work orders list cannot be null");
+		this.number = number;
+		this.date = date;
+		workOrders.forEach(this::addWorkOrder);
+	}
+
+	public static LocalDate getJuly12012() {
+		return JULY_1_2012;
+	}
+
+	public long getNumber() {
+		return number;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public InvoiceState getState() {
+		return state;
+	}
+
+	public Money getSubtotal() {
+		return subtotal;
+	}
+
+	public Percentage getVatRate() {
+		return vatRate;
+	}
+
+	public Money getVatAmount() {
+		return vatAmount;
+	}
+
+	public Money getTotal() {
+		return total;
 	}
 
 	// ---- Getters ----
@@ -171,5 +208,24 @@ public class Invoice {
 		requestedCharges.values().forEach(calculator::add);
 		return calculator.toMoneyRoundedToCents();
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(Long.valueOf(number));
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Invoice other = (Invoice) obj;
+		return number == other.number;
+	}
+
+
 
 }

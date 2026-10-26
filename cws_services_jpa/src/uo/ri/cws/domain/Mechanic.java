@@ -18,15 +18,30 @@ public class Mechanic {
 	private Set<WorkOrder> assigned = new HashSet<>();
 	
 	public Mechanic(Nif nif) {
-		// Delegate to the other constructor with meaningful default values for the fullname
-		throw new UnsupportedOperationException("Not implemented yet");
+		this(nif, new FullName("No name", "No surname"));
 	}
 
 	public Mechanic(Nif nif, FullName name) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		ArgumentChecks.isNotNull(nif);
+		ArgumentChecks.isNotNull(name);
+
+		this.nif = nif;
+		this.fullName = name;
+	}
+
+	public Nif getNif() {
+		return nif;
+	}
+
+	public FullName getFullName() {
+		return fullName;
 	}
 
 	// ---- Setters (optional, controlled) ----
+	
+	public Set<WorkOrder> getAssigned() {
+		return assigned;
+	}
 
 	public void setFullName(FullName name) {
 		ArgumentChecks.isNotNull(name);
@@ -42,6 +57,24 @@ public class Mechanic {
 
 	Set<WorkOrder> _getAssigned() {
 		return assigned;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(assigned, fullName, nif);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Mechanic other = (Mechanic) obj;
+		return Objects.equals(assigned, other.assigned) && Objects.equals(fullName, other.fullName)
+				&& Objects.equals(nif, other.nif);
 	}
 
 }

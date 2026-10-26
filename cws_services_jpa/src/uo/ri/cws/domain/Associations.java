@@ -7,12 +7,35 @@ public class Associations {
 
 	public static class Owns {
 
+		/**
+		 * TODO: pr
+		 * @param client
+		 * @param vehicle
+		 */
 		public static void link(Client client, Vehicle vehicle) {
-			throw new UnsupportedOperationException("Not implemented yet");
+			ArgumentChecks.isNotNull(client);
+			ArgumentChecks.isNotNull(vehicle);
+			StateChecks.isTrue(vehicle.getClient() == null, "Vehicle already has a client");
+			StateChecks.isFalse(client._getVehicles().contains(vehicle), "Client already has this vehicle");
+			
+			// cliente 1 - 0..* vehiculo
+			client._getVehicles().add(vehicle);
+			vehicle._setClient(client);
+			
 		}
 
+		/**
+		 * TODO: pr
+		 * @param vehicle
+		 */
 		public static void unlink(Vehicle vehicle) {
-			throw new UnsupportedOperationException("Not implemented yet");
+			ArgumentChecks.isNotNull(vehicle);
+			Client client = vehicle.getClient();
+			StateChecks.isTrue(client != null, "Vehicle has no client");
+			StateChecks.isTrue(client._getVehicles().contains(vehicle), "Client does not have this vehicle");
+
+			client._getVehicles().remove(vehicle);
+			vehicle._setClient(null);
 		}
 	}
 
@@ -23,7 +46,9 @@ public class Associations {
 			ArgumentChecks.isNotNull(vehicle);
 			StateChecks.isTrue(vehicle.getVehicleType() == null, "Vehicle already has a vehicle type");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			// vehicle 0..* - 1 vehicleType
+			vehicle._setVehicleType(vehicleType);
+			vehicleType._getVehicles().add(vehicle);
 		}
 
 		public static void unlink(Vehicle vehicle) {
@@ -58,8 +83,12 @@ public class Associations {
 
 	public static class Fixes {
 
-		/* package */ static void link(Vehicle vehicle, WorkOrder workOrder) {
-			throw new UnsupportedOperationException("Not implemented yet");
+		static void link(Vehicle vehicle, WorkOrder workOrder) {
+			ArgumentChecks.isNotNull(vehicle);
+			
+			// vehiculo 1 - 0..* workorder
+			vehicle._getWorkOrders().add(workOrder);
+			workOrder._setVehicle(vehicle);
 		}
 
 		public static void unlink(WorkOrder workOrder) {
@@ -69,12 +98,23 @@ public class Associations {
 
 	public static class Bills {
 
-		/* package */ static void link(Invoice invoice, WorkOrder workOrder) {
-			throw new UnsupportedOperationException("Not implemented yet");
+		static void link(Invoice invoice, WorkOrder workOrder) {
+			ArgumentChecks.isNotNull(invoice);
+			ArgumentChecks.isNotNull(workOrder);
+			
+			// invoice 0..1 - 1..* workorder
+			invoice._getWorkOrders().add(workOrder);
+			workOrder._setInvoice(invoice);
 		}
 
-		/* package */ static void unlink(WorkOrder workOrder) {
-			throw new UnsupportedOperationException("Not implemented yet");
+		static void unlink(WorkOrder workOrder) {
+			ArgumentChecks.isNotNull(workOrder);
+			Invoice invoice = workOrder.getInvoice();
+			StateChecks.isTrue(invoice != null, "Work order has no invoice");
+			StateChecks.isTrue(invoice._getWorkOrders().contains(workOrder), "Invoice does not have this work order");
+
+			invoice._getWorkOrders().remove(workOrder);
+			workOrder._setInvoice(null);
 		}
 	}
 
