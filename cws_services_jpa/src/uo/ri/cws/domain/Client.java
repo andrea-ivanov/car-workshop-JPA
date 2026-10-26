@@ -20,7 +20,9 @@ public class Client {
 	private PhoneNumber phone;
 	private Address address;
 	
+	// Accidental attributes
 	private Set<Vehicle> vehicles = new HashSet<>();
+	private Set<PaymentMean> paymentMeans = new HashSet<>();
 
 	// ---- Constructors ----
 	public Client(Nif nif) {
@@ -75,21 +77,20 @@ public class Client {
 		return address;
 	}
 	
-	/**
-	 * todo
-	 * @return
-	 */
 	public Set<Vehicle> getVehicles() {
-		Set<Vehicle> vehicles = new HashSet<>(this.vehicles);
-		return vehicles;
+		return new HashSet<>(this.vehicles);
 	}
 	
-	/**
-	 * TODO: pr
-	 * @return
-	 */
 	Set<Vehicle> _getVehicles() {
-		return this.getVehicles();
+		return this.vehicles;
+	}
+
+	public Set<PaymentMean> getPaymentMeans() {
+		return new HashSet<>(this.paymentMeans);
+	}
+
+	Set<PaymentMean> _getPaymentMeans() {
+		return this.paymentMeans;
 	}
 
 	@Override
@@ -109,6 +110,10 @@ public class Client {
 		return Objects.equals(nif, other.nif);
 	}
 
-	
-	
+	@Override
+	public String toString() {
+		return "Client [nif=" + nif + ", fullName=" + fullName + ", email=" + email + ", phone=" + phone
+				+ ", address=" + address + "]";
+	}
+
 }

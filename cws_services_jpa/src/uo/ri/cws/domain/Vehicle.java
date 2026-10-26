@@ -15,11 +15,10 @@ public class Vehicle {
 	private String make;
 	private String model;
 	
-	private Client client;
-	private Set<WorkOrder> workOrders = new HashSet<>();
-	
 	// Accidental attributes
+	private Client client;
 	private VehicleType vehicleType;
+	private Set<WorkOrder> workOrders = new HashSet<>();
 
 	// ---- Constructors ----
 
@@ -29,8 +28,8 @@ public class Vehicle {
 
 	public Vehicle(LicensePlate plateNumber, String make, String model) {
 		ArgumentChecks.isNotNull(plateNumber);
-		ArgumentChecks.isNotEmpty(make);
-		ArgumentChecks.isNotEmpty(model);
+		ArgumentChecks.isNotBlank(make);
+		ArgumentChecks.isNotBlank(model);
 
 		this.licensePlate = plateNumber;
 		this.make = make;
@@ -54,24 +53,21 @@ public class Vehicle {
 	}
 
 	public Money getPricePerHour() {
-		return vehicleType.getPricePerHour(); // VehicleType must return Money
+		return vehicleType.getPricePerHour();
 	}
 	
-	/**
-	 * TODO: pr
-	 */
 	public Client getClient() {
 		return client;
 	}
 	
-	/**
-	 * TODO: pr
-	 * @param client
-	 */
 	void _setClient(Client client) {
 		this.client = client;
 	}
 	
+	void _setVehicleType(VehicleType vehicleType) {
+		this.vehicleType = vehicleType;
+	}
+
 	public Set<WorkOrder> getWorkOrders() {
 		return new HashSet<>(workOrders);
 	}
@@ -82,7 +78,7 @@ public class Vehicle {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(licensePlate, make, model, vehicleType);
+		return Objects.hash(licensePlate);
 	}
 
 	@Override
@@ -94,13 +90,12 @@ public class Vehicle {
 		if (getClass() != obj.getClass())
 			return false;
 		Vehicle other = (Vehicle) obj;
-		return Objects.equals(licensePlate, other.licensePlate) && Objects.equals(make, other.make)
-				&& Objects.equals(model, other.model) && Objects.equals(vehicleType, other.vehicleType);
+		return Objects.equals(licensePlate, other.licensePlate);
 	}
 
-	public void _setVehicleType(VehicleType vehicleType) {
-		this.vehicleType = vehicleType;
+	@Override
+	public String toString() {
+		return "Vehicle [licensePlate=" + licensePlate + ", make=" + make + ", model=" + model + "]";
 	}
-	
-	
+
 }

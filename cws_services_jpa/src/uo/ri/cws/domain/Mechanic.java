@@ -16,14 +16,14 @@ public class Mechanic {
 
 	// Accidental attributes
 	private Set<WorkOrder> assigned = new HashSet<>();
-	
+
 	public Mechanic(Nif nif) {
 		this(nif, new FullName("No name", "No surname"));
 	}
 
 	public Mechanic(Nif nif, FullName name) {
-		ArgumentChecks.isNotNull(nif);
-		ArgumentChecks.isNotNull(name);
+		ArgumentChecks.isNotNull(nif, "NIF cannot be null");
+		ArgumentChecks.isNotNull(name, "FullName cannot be null");
 
 		this.nif = nif;
 		this.fullName = name;
@@ -37,20 +37,13 @@ public class Mechanic {
 		return fullName;
 	}
 
-	// ---- Setters (optional, controlled) ----
-	
 	public Set<WorkOrder> getAssigned() {
-		return assigned;
+		return new HashSet<>(assigned);
 	}
 
 	public void setFullName(FullName name) {
-		ArgumentChecks.isNotNull(name);
+		ArgumentChecks.isNotNull(name, "FullName cannot be null");
 		this.fullName = name;
-	}
-	
-	public void setNif(Nif nif) {
-		ArgumentChecks.isNotNull(nif);
-		this.nif = nif;		
 	}
 
 	// ---- Associations helpers ----
@@ -61,7 +54,7 @@ public class Mechanic {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(assigned, fullName, nif);
+		return Objects.hash(nif);
 	}
 
 	@Override
@@ -73,8 +66,12 @@ public class Mechanic {
 		if (getClass() != obj.getClass())
 			return false;
 		Mechanic other = (Mechanic) obj;
-		return Objects.equals(assigned, other.assigned) && Objects.equals(fullName, other.fullName)
-				&& Objects.equals(nif, other.nif);
+		return Objects.equals(nif, other.nif);
+	}
+
+	@Override
+	public String toString() {
+		return "Mechanic [nif=" + nif + ", fullName=" + fullName + "]";
 	}
 
 }

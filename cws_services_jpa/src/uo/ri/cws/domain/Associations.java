@@ -7,27 +7,16 @@ public class Associations {
 
 	public static class Owns {
 
-		/**
-		 * TODO: pr
-		 * @param client
-		 * @param vehicle
-		 */
 		public static void link(Client client, Vehicle vehicle) {
 			ArgumentChecks.isNotNull(client);
 			ArgumentChecks.isNotNull(vehicle);
 			StateChecks.isTrue(vehicle.getClient() == null, "Vehicle already has a client");
 			StateChecks.isFalse(client._getVehicles().contains(vehicle), "Client already has this vehicle");
-			
-			// cliente 1 - 0..* vehiculo
+
 			client._getVehicles().add(vehicle);
 			vehicle._setClient(client);
-			
 		}
 
-		/**
-		 * TODO: pr
-		 * @param vehicle
-		 */
 		public static void unlink(Vehicle vehicle) {
 			ArgumentChecks.isNotNull(vehicle);
 			Client client = vehicle.getClient();
@@ -56,7 +45,8 @@ public class Associations {
 			VehicleType vehicleType = vehicle.getVehicleType();
 			StateChecks.isTrue(vehicleType != null, "Vehicle has no vehicle type");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			vehicleType._getVehicles().remove(vehicle);
+			vehicle._setVehicleType(null);
 		}
 	}
 
@@ -66,48 +56,61 @@ public class Associations {
 			ArgumentChecks.isNotNull(client);
 			ArgumentChecks.isNotNull(paymentMean);
 			StateChecks.isTrue(paymentMean.getClient() == null, "Payment mean already has a client");
-			StateChecks.isFalse(client._getPaymentMeans().contains(paymentMean), "Client already has this payment mean");
+			StateChecks.isFalse(client._getPaymentMeans().contains(paymentMean),
+					"Client already has this payment mean");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			paymentMean._setClient(client);
+			client._getPaymentMeans().add(paymentMean);
 		}
 
 		public static void unlink(PaymentMean paymentMean) {
 			ArgumentChecks.isNotNull(paymentMean);
 			Client client = paymentMean.getClient();
 			StateChecks.isTrue(client != null, "Payment mean has no client");
-			StateChecks.isTrue(client._getPaymentMeans().contains(paymentMean), "Client does not have this payment mean");
+			StateChecks.isTrue(client._getPaymentMeans().contains(paymentMean),
+					"Client does not have this payment mean");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			client._getPaymentMeans().remove(paymentMean);
+			paymentMean._setClient(null);
 		}
 	}
 
 	public static class Fixes {
 
-		static void link(Vehicle vehicle, WorkOrder workOrder) {
+		public static void link(Vehicle vehicle, WorkOrder workOrder) {
 			ArgumentChecks.isNotNull(vehicle);
-			
-			// vehiculo 1 - 0..* workorder
-			vehicle._getWorkOrders().add(workOrder);
+			ArgumentChecks.isNotNull(workOrder);
+			StateChecks.isTrue(workOrder.getVehicle() == null, "Work order already has a vehicle");
+			StateChecks.isFalse(vehicle._getWorkOrders().contains(workOrder), "Vehicle already has this work order");
+
 			workOrder._setVehicle(vehicle);
+			vehicle._getWorkOrders().add(workOrder);
 		}
 
 		public static void unlink(WorkOrder workOrder) {
-			throw new UnsupportedOperationException("Not implemented yet");
+			ArgumentChecks.isNotNull(workOrder);
+			Vehicle vehicle = workOrder.getVehicle();
+			StateChecks.isTrue(vehicle != null, "Work order has no vehicle");
+			StateChecks.isTrue(vehicle._getWorkOrders().contains(workOrder), "Vehicle does not have this work order");
+
+			vehicle._getWorkOrders().remove(workOrder);
+			workOrder._setVehicle(null);
 		}
 	}
 
 	public static class Bills {
 
-		static void link(Invoice invoice, WorkOrder workOrder) {
+		public static void link(Invoice invoice, WorkOrder workOrder) {
 			ArgumentChecks.isNotNull(invoice);
 			ArgumentChecks.isNotNull(workOrder);
-			
-			// invoice 0..1 - 1..* workorder
-			invoice._getWorkOrders().add(workOrder);
+			StateChecks.isTrue(workOrder.getInvoice() == null, "Work order already has an invoice");
+			StateChecks.isFalse(invoice._getWorkOrders().contains(workOrder), "Invoice already has this work order");
+
 			workOrder._setInvoice(invoice);
+			invoice._getWorkOrders().add(workOrder);
 		}
 
-		static void unlink(WorkOrder workOrder) {
+		public static void unlink(WorkOrder workOrder) {
 			ArgumentChecks.isNotNull(workOrder);
 			Invoice invoice = workOrder.getInvoice();
 			StateChecks.isTrue(invoice != null, "Work order has no invoice");
@@ -129,7 +132,6 @@ public class Associations {
 				Invoice invoice,
 				Charge charge,
 				PaymentMean paymentMean) {
-			
 			ArgumentChecks.isNotNull(invoice);
 			ArgumentChecks.isNotNull(charge);
 			ArgumentChecks.isNotNull(paymentMean);
@@ -179,7 +181,8 @@ public class Associations {
 	}
 
 	/**
-	 * Atomically manages the records and intervenes associations of an Intervention.
+	 * Atomically manages the records and intervenes associations of an
+	 * Intervention.
 	 * All identity ends are set before adding to, and cleared after removing from,
 	 * the inverse collection.
 	 */
@@ -194,9 +197,12 @@ public class Associations {
 			ArgumentChecks.isNotNull(mechanic);
 			StateChecks.isTrue(intervention.getWorkOrder() == null, "Intervention already has a work order");
 			StateChecks.isTrue(intervention.getMechanic() == null, "Intervention already has a mechanic");
-			StateChecks.isFalse(workOrder._getInterventions().contains(intervention), "Work order already has this intervention");
+			StateChecks.isFalse(workOrder._getInterventions().contains(intervention),
+					"Work order already has this intervention");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			intervention._setWorkOrder(workOrder);
+			intervention._setMechanic(mechanic);
+			workOrder._getInterventions().add(intervention);
 		}
 
 		/* package */ static void atomicUnlink(Intervention intervention) {
@@ -204,14 +210,18 @@ public class Associations {
 			WorkOrder workOrder = intervention.getWorkOrder();
 			StateChecks.isTrue(workOrder != null, "Intervention has no work order");
 			StateChecks.isTrue(intervention.getMechanic() != null, "Intervention has no mechanic");
-			StateChecks.isTrue(workOrder._getInterventions().contains(intervention), "Work order does not have this intervention");
+			StateChecks.isTrue(workOrder._getInterventions().contains(intervention),
+					"Work order does not have this intervention");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			workOrder._getInterventions().remove(intervention);
+			intervention._setWorkOrder(null);
+			intervention._setMechanic(null);
 		}
 	}
 
 	/**
-	 * Atomically manages the performs and substitutes associations of a Substitution.
+	 * Atomically manages the performs and substitutes associations of a
+	 * Substitution.
 	 * All identity ends are set before adding to, and cleared after removing from,
 	 * the inverse collection.
 	 */
@@ -226,7 +236,8 @@ public class Associations {
 			ArgumentChecks.isNotNull(sparePart);
 			StateChecks.isTrue(substitution.getIntervention() == null, "Substitution already has an intervention");
 			StateChecks.isTrue(substitution.getSparePart() == null, "Substitution already has a spare part");
-			StateChecks.isFalse(intervention._getSubstitutions().contains(substitution), "Intervention already has this substitution");
+			StateChecks.isFalse(intervention._getSubstitutions().contains(substitution),
+					"Intervention already has this substitution");
 
 			substitution._setIntervention(intervention);
 			substitution._setSparePart(sparePart);
@@ -238,7 +249,8 @@ public class Associations {
 			Intervention intervention = substitution.getIntervention();
 			StateChecks.isTrue(intervention != null, "Substitution has no intervention");
 			StateChecks.isTrue(substitution.getSparePart() != null, "Substitution has no spare part");
-			StateChecks.isTrue(intervention._getSubstitutions().contains(substitution), "Intervention does not have this substitution");
+			StateChecks.isTrue(intervention._getSubstitutions().contains(substitution),
+					"Intervention does not have this substitution");
 
 			intervention._getSubstitutions().remove(substitution);
 			substitution._setIntervention(null);

@@ -1,49 +1,50 @@
 package uo.ri.cws.domain;
 
-import java.util.Objects;
-
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 import uo.ri.util.assertion.StateChecks;
 
-
 public abstract class PaymentMean {
 
 	// Natural attributes
-    private Money accumulated = Money.ZERO; // cents
+	private Money accumulated = Money.ZERO; // cents
 
-    // Accidental attributes
-    private Client client;
+	// Accidental attributes
+	private Client client;
 
-    // ---- Association helpers ----
+	// ---- Association helpers ----
 
-    void _setClient(Client client) {
-        this.client = client;
-    }
+	void _setClient(Client client) {
+		this.client = client;
+	}
 
-    // ---- Business methods ----
+	// ---- Business methods ----
 
-    public abstract boolean canBeCharged(Money amount);
+	public abstract boolean canBeCharged(Money amount);
 
-    /**
-     * Increments the accumulated amount of the payment mean by the given amount.
-     * package-private Only called from Charge constructor.
-     * @param amount
-     */
-    /* package */ void charge(Money amount) {
-    	// Normalize the amount to cents 
-    	// check if it can be charged
-    	// increment the accumulated amount
-    	throw new UnsupportedOperationException("Not implemented yet");
-    }
+	/**
+	 * Increments the accumulated amount of the payment mean by the given amount.
+	 * package-private Only called from Charge constructor.
+	 * 
+	 * @param amount
+	 */
+	/* package */ void charge(Money amount) {
+		Money normalized = normalizePositive(amount);
+		StateChecks.isTrue(canBeCharged(normalized), "Payment mean cannot accept this charge");
+		this.accumulated = Money.calc(this.accumulated).add(normalized).toMoneyRoundedToCents();
+	}
 
-    /**
+	/**
 	 * Decrements the accumulated amount of the payment mean by the given amount.
 	 * package-private Only called from Charge.rewind().
+	 * 
 	 * @param amount
 	 */
 	/* package */ void rewind(Money amount) {
-    	throw new UnsupportedOperationException("Not implemented yet");
+		Money normalized = normalizePositive(amount);
+		StateChecks.isTrue(this.accumulated.greaterOrEqual(normalized),
+				"Cannot rewind more than accumulated amount");
+		this.accumulated = Money.calc(this.accumulated).subtract(normalized).toMoneyRoundedToCents();
 	}
 
 	public Client getClient() {
@@ -67,4 +68,3 @@ public abstract class PaymentMean {
 	}
 
 }
-
