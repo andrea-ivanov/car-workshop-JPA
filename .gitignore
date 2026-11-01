@@ -1,0 +1,38 @@
+# ==========================================
+# Archivos de compilación Maven y Java
+# ==========================================
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+
+# ==========================================
+# Sistema operativo (macOS)
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# ==========================================
+# Configuración y metadatos de Eclipse
+# ==========================================
+.metadata/
+.recommenders/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+
+# ==========================================
+# Otros entornos (IntelliJ / VS Code)
+# ==========================================
+.idea/
+*.iml
+.vscode/
