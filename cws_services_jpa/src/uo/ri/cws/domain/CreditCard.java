@@ -10,7 +10,7 @@ import uo.ri.util.assertion.ArgumentChecks;
 
 public class CreditCard extends PaymentMean {
 
-	private CreditCardNumber number;
+    private CreditCardNumber number;
     private String type;
     private LocalDate validThru;
 
@@ -27,14 +27,57 @@ public class CreditCard extends PaymentMean {
 
     // ---- Business methods ----
     public boolean isValidNow() {
-    	return ! validThru.isBefore( LocalDate.now() ); // validThru >= today, today included
+        return !validThru.isBefore(LocalDate.now()); // validThru >= today, today included
     }
 
-	/**
-	 * A credit card can pay if is not outdated and the amount is positive. 
-	 */
+    /**
+     * A credit card can pay if is not outdated and the amount is positive.
+     */
     @Override
     public boolean canBeCharged(Money amount) {
-    	throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not implemented yet");
     }
+
+    public CreditCardNumber getNumber() {
+        return number;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public YearMonth getValidThru() {
+        return YearMonth.from(validThru);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((number == null) ? 0 : number.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CreditCard other = (CreditCard) obj;
+        if (number == null) {
+            if (other.number != null)
+                return false;
+        } else if (!number.equals(other.number))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "CreditCard [number=" + number + ", type=" + type + ", validThru=" + validThru + "]";
+    }
+
 }

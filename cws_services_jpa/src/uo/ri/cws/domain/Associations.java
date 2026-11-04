@@ -7,12 +7,26 @@ public class Associations {
 
 	public static class Owns {
 
+		/*
+		 * Client one to many vehicle
+		 */
 		public static void link(Client client, Vehicle vehicle) {
-			throw new UnsupportedOperationException("Not implemented yet");
+			ArgumentChecks.isNotNull(client);
+			ArgumentChecks.isNotNull(vehicle);
+			StateChecks.isTrue(vehicle.getClient() == null, "El cliente no es nulo antes de asignar nuevo");
+			StateChecks.isFalse(client._getVehicles().contains(vehicle), "El cliente ya está asociado a sus vehiculos");
+			vehicle._setClient(client);
+			client._getVehicles().add(vehicle);
 		}
 
 		public static void unlink(Vehicle vehicle) {
-			throw new UnsupportedOperationException("Not implemented yet");
+			ArgumentChecks.isNotNull(vehicle);
+			Client client = vehicle.getClient();
+			StateChecks.isTrue(client != null, "Cliente ya vacío");
+			StateChecks.isTrue(client._getVehicles().contains(vehicle));
+
+			client._getVehicles().remove(vehicle);
+			vehicle._setClient(null);
 		}
 	}
 
@@ -41,7 +55,8 @@ public class Associations {
 			ArgumentChecks.isNotNull(client);
 			ArgumentChecks.isNotNull(paymentMean);
 			StateChecks.isTrue(paymentMean.getClient() == null, "Payment mean already has a client");
-			StateChecks.isFalse(client._getPaymentMeans().contains(paymentMean), "Client already has this payment mean");
+			StateChecks.isFalse(client._getPaymentMeans().contains(paymentMean),
+					"Client already has this payment mean");
 
 			throw new UnsupportedOperationException("Not implemented yet");
 		}
@@ -50,7 +65,8 @@ public class Associations {
 			ArgumentChecks.isNotNull(paymentMean);
 			Client client = paymentMean.getClient();
 			StateChecks.isTrue(client != null, "Payment mean has no client");
-			StateChecks.isTrue(client._getPaymentMeans().contains(paymentMean), "Client does not have this payment mean");
+			StateChecks.isTrue(client._getPaymentMeans().contains(paymentMean),
+					"Client does not have this payment mean");
 
 			throw new UnsupportedOperationException("Not implemented yet");
 		}
@@ -89,7 +105,7 @@ public class Associations {
 				Invoice invoice,
 				Charge charge,
 				PaymentMean paymentMean) {
-			
+
 			ArgumentChecks.isNotNull(invoice);
 			ArgumentChecks.isNotNull(charge);
 			ArgumentChecks.isNotNull(paymentMean);
@@ -139,7 +155,8 @@ public class Associations {
 	}
 
 	/**
-	 * Atomically manages the records and intervenes associations of an Intervention.
+	 * Atomically manages the records and intervenes associations of an
+	 * Intervention.
 	 * All identity ends are set before adding to, and cleared after removing from,
 	 * the inverse collection.
 	 */
@@ -154,7 +171,8 @@ public class Associations {
 			ArgumentChecks.isNotNull(mechanic);
 			StateChecks.isTrue(intervention.getWorkOrder() == null, "Intervention already has a work order");
 			StateChecks.isTrue(intervention.getMechanic() == null, "Intervention already has a mechanic");
-			StateChecks.isFalse(workOrder._getInterventions().contains(intervention), "Work order already has this intervention");
+			StateChecks.isFalse(workOrder._getInterventions().contains(intervention),
+					"Work order already has this intervention");
 
 			throw new UnsupportedOperationException("Not implemented yet");
 		}
@@ -164,14 +182,16 @@ public class Associations {
 			WorkOrder workOrder = intervention.getWorkOrder();
 			StateChecks.isTrue(workOrder != null, "Intervention has no work order");
 			StateChecks.isTrue(intervention.getMechanic() != null, "Intervention has no mechanic");
-			StateChecks.isTrue(workOrder._getInterventions().contains(intervention), "Work order does not have this intervention");
+			StateChecks.isTrue(workOrder._getInterventions().contains(intervention),
+					"Work order does not have this intervention");
 
 			throw new UnsupportedOperationException("Not implemented yet");
 		}
 	}
 
 	/**
-	 * Atomically manages the performs and substitutes associations of a Substitution.
+	 * Atomically manages the performs and substitutes associations of a
+	 * Substitution.
 	 * All identity ends are set before adding to, and cleared after removing from,
 	 * the inverse collection.
 	 */
@@ -186,7 +206,8 @@ public class Associations {
 			ArgumentChecks.isNotNull(sparePart);
 			StateChecks.isTrue(substitution.getIntervention() == null, "Substitution already has an intervention");
 			StateChecks.isTrue(substitution.getSparePart() == null, "Substitution already has a spare part");
-			StateChecks.isFalse(intervention._getSubstitutions().contains(substitution), "Intervention already has this substitution");
+			StateChecks.isFalse(intervention._getSubstitutions().contains(substitution),
+					"Intervention already has this substitution");
 
 			substitution._setIntervention(intervention);
 			substitution._setSparePart(sparePart);
@@ -198,7 +219,8 @@ public class Associations {
 			Intervention intervention = substitution.getIntervention();
 			StateChecks.isTrue(intervention != null, "Substitution has no intervention");
 			StateChecks.isTrue(substitution.getSparePart() != null, "Substitution has no spare part");
-			StateChecks.isTrue(intervention._getSubstitutions().contains(substitution), "Intervention does not have this substitution");
+			StateChecks.isTrue(intervention._getSubstitutions().contains(substitution),
+					"Intervention does not have this substitution");
 
 			intervention._getSubstitutions().remove(substitution);
 			substitution._setIntervention(null);

@@ -6,7 +6,7 @@ import uo.ri.util.assertion.StateChecks;
 
 public class Charge {
 
-	// Natural attributes
+    // Natural attributes
     private Money amount; // cents
 
     // Accidental attributes
@@ -14,13 +14,13 @@ public class Charge {
     private PaymentMean paymentMean;
 
     // ------ Constructors -----
-    
+
     /* package */ Charge(Invoice invoice, PaymentMean paymentMean, Money amount) {
-    	// validates the arguments
-		// store the amount rounded to cents
-		// increments the paymentMean accumulated -> paymentMean.charge( amount )
-		// links invoice, this and paymentMean
-    	throw new UnsupportedOperationException("Not yet implemented");
+        // validates the arguments
+        // store the amount rounded to cents
+        // increments the paymentMean accumulated -> paymentMean.charge( amount )
+        // links invoice, this and paymentMean
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     // ---- Getters ----
@@ -37,14 +37,15 @@ public class Charge {
         return paymentMean;
     }
 
-    // ---- Bussiness methods  ----
+    // ---- Bussiness methods ----
 
     /**
-     * Restores and the value to the payment mean and unlinks the charge from the invoice and the payment mean.
+     * Restores and the value to the payment mean and unlinks the charge from the
+     * invoice and the payment mean.
      */
-	/* package */ void rewind() {
-		// decrements the payment mean accumulated ( paymentMean.rewind( amount) )
-    	throw new UnsupportedOperationException("Not yet implemented");
+    /* package */ void rewind() {
+        // decrements the payment mean accumulated ( paymentMean.rewind( amount) )
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     // ---- Association helpers ----
@@ -57,9 +58,41 @@ public class Charge {
         this.paymentMean = paymentMean;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((invoice == null) ? 0 : invoice.hashCode());
+        result = prime * result + ((paymentMean == null) ? 0 : paymentMean.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Charge other = (Charge) obj;
+        if (invoice == null) {
+            if (other.invoice != null)
+                return false;
+        } else if (!invoice.equals(other.invoice))
+            return false;
+        if (paymentMean == null) {
+            if (other.paymentMean != null)
+                return false;
+        } else if (!paymentMean.equals(other.paymentMean))
+            return false;
+        return true;
+    }
+
     // ---- toString ----
     @Override
     public String toString() {
-		return "Charge [invoice=" + invoice + ", paymentMean=" + paymentMean + ", amount=" + amount + "]";
+        return "Charge [invoice=" + invoice + ", paymentMean=" + paymentMean + ", amount=" + amount + "]";
     }
+
 }

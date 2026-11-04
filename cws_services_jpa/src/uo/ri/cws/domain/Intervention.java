@@ -12,7 +12,8 @@ import uo.ri.util.assertion.ArgumentChecks;
 
 /**
  * Represents an intervention performed by a mechanic on a work order.
- * Internal aggregate class of WorkOrder. Only WorkOrder can create Interventions.
+ * Internal aggregate class of WorkOrder. Only WorkOrder can create
+ * Interventions.
  */
 public class Intervention {
 	// Natural attributes
@@ -26,7 +27,7 @@ public class Intervention {
 
 	// ---------------------------- Constructors -----------------------------
 	/**
-	 * All these constructors are package-private 
+	 * All these constructors are package-private
 	 * Only WorkOrder (aggregate root) can create Interventions
 	 */
 	/* package */ Intervention(Mechanic mechanic, WorkOrder workOrder, int minutes) {
@@ -39,11 +40,13 @@ public class Intervention {
 
 	/**
 	 * Creates a new Intervention with the given parameters.
-	 * @param mechanic The mechanic performing the intervention.
-	 * @param workOrder The work order associated with the intervention.
-	 * @param date The date and time of the intervention.
-	 * @param minutes The duration of the intervention in minutes.
-	 * @param substitutions A map of spare parts and their quantities used in the intervention.
+	 * 
+	 * @param mechanic      The mechanic performing the intervention.
+	 * @param workOrder     The work order associated with the intervention.
+	 * @param date          The date and time of the intervention.
+	 * @param minutes       The duration of the intervention in minutes.
+	 * @param substitutions A map of spare parts and their quantities used in the
+	 *                      intervention.
 	 */
 	/* package */ Intervention(
 			Mechanic mechanic,
@@ -51,7 +54,7 @@ public class Intervention {
 			LocalDateTime date,
 			int minutes,
 			Map<SparePart, Integer> substitutions) {
-		
+
 		// Validate input parameters
 		// Truncate the date to milliseconds to avoid precision issues
 		// links the intervention with the work order and mechanic (atomiclink)
@@ -59,7 +62,8 @@ public class Intervention {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
-	// ---------------------------- Association helpers -----------------------------
+	// ---------------------------- Association helpers
+	// -----------------------------
 	void _setMechanic(Mechanic mechanic) {
 		this.mechanic = mechanic;
 	}
@@ -83,23 +87,26 @@ public class Intervention {
 	}
 
 	/**
-	 * Calculates the total amount of the intervention, including work and spare parts.
-	 * @return The total amount of the intervention rounded to cents as a Money object.
+	 * Calculates the total amount of the intervention, including work and spare
+	 * parts.
+	 * 
+	 * @return The total amount of the intervention rounded to cents as a Money
+	 *         object.
 	 */
 	public Money getTotalAmount() {
 		return Money.calc()
-				.add( calculateWorkAmount() )
-				.add( calculateSparesAmount() )
+				.add(calculateWorkAmount())
+				.add(calculateSparesAmount())
 				.toMoneyRoundedToCents();
 	}
 
 	private Money calculateWorkAmount() {
 		Money pricePerHour = workOrder.getPricePerHour();
-		
+
 		return Money.calc(pricePerHour)
-                .times( minutes )
-                .div( 60 ) // mins/hour
-                .toMoneyExact();
+				.times(minutes)
+				.div(60) // mins/hour
+				.toMoneyExact();
 	}
 
 	private Money calculateSparesAmount() {
@@ -112,6 +119,64 @@ public class Intervention {
 
 	private static void validateSubstitutions(Map<SparePart, Integer> substitutions) {
 		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	public LocalDateTime getDate() {
+		return date;
+	}
+
+	public int getMinutes() {
+		return minutes;
+	}
+
+	public WorkOrder getWorkOrder() {
+		return workOrder;
+	}
+
+	public Mechanic getMechanic() {
+		return mechanic;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + ((workOrder == null) ? 0 : workOrder.hashCode());
+		result = prime * result + ((mechanic == null) ? 0 : mechanic.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Intervention other = (Intervention) obj;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (!date.equals(other.date))
+			return false;
+		if (workOrder == null) {
+			if (other.workOrder != null)
+				return false;
+		} else if (!workOrder.equals(other.workOrder))
+			return false;
+		if (mechanic == null) {
+			if (other.mechanic != null)
+				return false;
+		} else if (!mechanic.equals(other.mechanic))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Intervention [date=" + date + ", minutes=" + minutes + "]";
 	}
 
 }
