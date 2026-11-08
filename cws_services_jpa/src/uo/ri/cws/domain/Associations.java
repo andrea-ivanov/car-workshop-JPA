@@ -5,16 +5,17 @@ import uo.ri.util.assertion.StateChecks;
 
 public class Associations {
 
+	/*
+	 * Client one to many vehicle - bidireccional
+	 */
 	public static class Owns {
 
-		/*
-		 * Client one to many vehicle
-		 */
 		public static void link(Client client, Vehicle vehicle) {
 			ArgumentChecks.isNotNull(client);
 			ArgumentChecks.isNotNull(vehicle);
 			StateChecks.isTrue(vehicle.getClient() == null, "El cliente no es nulo antes de asignar nuevo");
 			StateChecks.isFalse(client._getVehicles().contains(vehicle), "El cliente ya está asociado a sus vehiculos");
+
 			vehicle._setClient(client);
 			client._getVehicles().add(vehicle);
 		}
@@ -30,14 +31,21 @@ public class Associations {
 		}
 	}
 
+	/*
+	 * Vehicle many to one VehicleType - unidireccional
+	 */
 	public static class Classifies {
 
+		/*
+		 * Relación unidireccional, VehicleType no conoce los vehículos, solo el
+		 * vehículo sabe de que tipo es
+		 */
 		public static void link(VehicleType vehicleType, Vehicle vehicle) {
 			ArgumentChecks.isNotNull(vehicleType);
 			ArgumentChecks.isNotNull(vehicle);
 			StateChecks.isTrue(vehicle.getVehicleType() == null, "Vehicle already has a vehicle type");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			vehicle._setVehicleType(vehicleType);
 		}
 
 		public static void unlink(Vehicle vehicle) {
@@ -45,10 +53,13 @@ public class Associations {
 			VehicleType vehicleType = vehicle.getVehicleType();
 			StateChecks.isTrue(vehicleType != null, "Vehicle has no vehicle type");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			vehicle._setVehicleType(null);
 		}
 	}
 
+	/*
+	 * Client one to many PaymentMean - bidireccional
+	 */
 	public static class Holds {
 
 		public static void link(Client client, PaymentMean paymentMean) {
@@ -58,7 +69,8 @@ public class Associations {
 			StateChecks.isFalse(client._getPaymentMeans().contains(paymentMean),
 					"Client already has this payment mean");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			paymentMean._setClient(client);
+			client._getPaymentMeans().add(paymentMean);
 		}
 
 		public static void unlink(PaymentMean paymentMean) {
@@ -68,29 +80,64 @@ public class Associations {
 			StateChecks.isTrue(client._getPaymentMeans().contains(paymentMean),
 					"Client does not have this payment mean");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			client._getPaymentMeans().remove(paymentMean);
+			paymentMean._setClient(null);
 		}
 	}
 
+	/*
+	 * Vehicle one to many WorkOrder - bidireccional
+	 */
 	public static class Fixes {
 
 		/* package */ static void link(Vehicle vehicle, WorkOrder workOrder) {
-			throw new UnsupportedOperationException("Not implemented yet");
+			ArgumentChecks.isNotNull(vehicle, "El vehiculo no puede ser nulo");
+			ArgumentChecks.isNotNull(workOrder, "La orden de trabajo no puede ser nula");
+			StateChecks.isFalse(vehicle.getWorkOrders().contains(workOrder),
+					"Ya está enlazada la orden de trabajo al vehículo");
+			StateChecks.isTrue(workOrder.getVehicle() == null, "Ya está enlazada la orden de trabajo al vehículo");
+
+			workOrder._setVehicle(vehicle);
+			vehicle._getWorkOrders().add(workOrder);
 		}
 
 		public static void unlink(WorkOrder workOrder) {
-			throw new UnsupportedOperationException("Not implemented yet");
+			ArgumentChecks.isNotNull(workOrder, "La orden de trabajo no puede ser nula");
+			Vehicle vehicle = workOrder.getVehicle();
+			StateChecks.isTrue(vehicle != null, "La orden de trabajo no está enlazada con el vehículo");
+			StateChecks.isTrue(vehicle.getWorkOrders().contains(workOrder),
+					"La orden de trabajo no está enlazada con el vehículo");
+
+			vehicle._getWorkOrders().remove(workOrder);
+			workOrder._setVehicle(null);
 		}
 	}
 
+	/*
+	 * Invoice one to many WorkOrder - bidireccional
+	 */
 	public static class Bills {
 
 		/* package */ static void link(Invoice invoice, WorkOrder workOrder) {
-			throw new UnsupportedOperationException("Not implemented yet");
+			ArgumentChecks.isNotNull(invoice, "La factura no puede ser nula");
+			ArgumentChecks.isNotNull(workOrder, "La orden de trabajo no puede ser nula");
+			StateChecks.isFalse(invoice.getWorkOrders().contains(workOrder),
+					"La factura ya tiene enlazada la orden de trabajo");
+			StateChecks.isTrue(workOrder.getInvoice() == null, "La orden de trabajo ya tiene factua asociada");
+
+			workOrder._setInvoice(invoice);
+			invoice._getWorkOrders().add(workOrder);
 		}
 
 		/* package */ static void unlink(WorkOrder workOrder) {
-			throw new UnsupportedOperationException("Not implemented yet");
+			ArgumentChecks.isNotNull(workOrder, "La orden de trabajo no puede ser nula");
+			Invoice invoice = workOrder.getInvoice();
+			StateChecks.isNotNull(invoice, "La orden de trabajo no tiene asociada factura");
+			StateChecks.isTrue(invoice.getWorkOrders().contains(workOrder),
+					"La factura no tiene asociada la orden de trabajo");
+
+			invoice._getWorkOrders().remove(workOrder);
+			workOrder._setInvoice(null);
 		}
 	}
 
@@ -174,7 +221,9 @@ public class Associations {
 			StateChecks.isFalse(workOrder._getInterventions().contains(intervention),
 					"Work order already has this intervention");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			intervention._setWorkOrder(workOrder);
+			intervention._setMechanic(mechanic);
+			workOrder._getInterventions().add(intervention);
 		}
 
 		/* package */ static void atomicUnlink(Intervention intervention) {
@@ -185,7 +234,9 @@ public class Associations {
 			StateChecks.isTrue(workOrder._getInterventions().contains(intervention),
 					"Work order does not have this intervention");
 
-			throw new UnsupportedOperationException("Not implemented yet");
+			workOrder._getInterventions().remove(intervention);
+			intervention._setMechanic(null);
+			intervention._setWorkOrder(null);
 		}
 	}
 

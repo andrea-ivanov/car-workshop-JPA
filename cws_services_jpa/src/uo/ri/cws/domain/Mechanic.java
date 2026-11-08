@@ -84,4 +84,8 @@ public class Mechanic {
 		return "Mechanic [nif=" + nif + ", fullName=" + fullName + "]";
 	}
 
+	public Set<WorkOrder> getAssigned() {
+		return new HashSet<>(assigned);
+	}
+
 }

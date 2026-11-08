@@ -1,13 +1,15 @@
 package uo.ri.cws.domain;
 
 import uo.ri.cws.domain.types.Money;
+import uo.ri.util.assertion.ArgumentChecks;
 
 public class Cash extends PaymentMean {
 
 	// ---- Constructors ----
-	
+
 	public Cash(Client client) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		ArgumentChecks.isNotNull(client, "El cliente es nulo");
+		Associations.Holds.link(client, this);
 	}
 
 	// ---- Business methods ----
@@ -20,7 +22,7 @@ public class Cash extends PaymentMean {
 	// ---- toString ----
 	@Override
 	public String toString() {
-		return "Cash [accumulated=" + getAccumulated() + ", client=" + getClient() + "]";
+		return "Cash [accumulated=" + getAccumulated() + "]";
 	}
 
 }

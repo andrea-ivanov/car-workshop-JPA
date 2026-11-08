@@ -21,6 +21,7 @@ public class Client {
 
 	// accidentales
 	private Set<Vehicle> vehicles = new HashSet<>();
+	private Set<PaymentMean> paymentMeans = new HashSet<>();
 
 	public Set<Vehicle> getVehicles() {
 		return new HashSet<>(vehicles);
@@ -119,4 +120,11 @@ public class Client {
 				+ address + "]";
 	}
 
+	Set<PaymentMean> _getPaymentMeans() {
+		return paymentMeans;
+	}
+
+	public Set<PaymentMean> getPaymentMeans() {
+		return new HashSet<>(paymentMeans);
+	}
 }

@@ -18,6 +18,7 @@ public class Vehicle {
 	// Accidental attributes
 	private VehicleType vehicleType;
 	private Client client;
+	private Set<WorkOrder> workOrders = new HashSet<>();
 
 	public Client getClient() {
 		return client;
@@ -92,4 +93,21 @@ public class Vehicle {
 	public String toString() {
 		return "Vehicle [licensePlate=" + licensePlate + ", make=" + make + ", model=" + model + "]";
 	}
+
+	public VehicleType getVehicleType() {
+		return vehicleType;
+	}
+
+	void _setVehicleType(VehicleType vehicleType) {
+		this.vehicleType = vehicleType;
+	}
+
+	public Set<WorkOrder> getWorkOrders() {
+		return new HashSet<>(workOrders);
+	}
+
+	public Set<WorkOrder> _getWorkOrders() {
+		return workOrders;
+	}
+
 }
