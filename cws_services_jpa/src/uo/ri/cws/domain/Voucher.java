@@ -1,7 +1,5 @@
 package uo.ri.cws.domain;
 
-import java.util.Objects;
-
 import uo.ri.cws.domain.types.Money;
 import uo.ri.cws.domain.types.VoucherCode;
 import uo.ri.util.assertion.ArgumentChecks;
@@ -53,18 +51,23 @@ public class Voucher extends PaymentMean {
     /* package */ void charge(Money amount) {
         // Charges the amount to the payment mean and subtracts it from the available
         // amount
-        throw new UnsupportedOperationException("Not implemented yet");
+        super.charge(amount);
+        Money normalized = normalizePositive(amount);
+        this.availableAmount = Money.calc(this.availableAmount).subtract(normalized).toMoneyRoundedToCents();
     }
 
     @Override
     /* package */ void rewind(Money amount) {
         // Rewinds the amount to the payment mean and adds it to the available amount
-        throw new UnsupportedOperationException("Not implemented yet");
+        super.rewind(amount);
+        Money normalized = normalizePositive(amount);
+        this.availableAmount = Money.calc(this.availableAmount).add(normalized).toMoneyRoundedToCents();
     }
 
     @Override
     public boolean canBeCharged(Money amount) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        checkPositive(amount);
+        return availableAmount.greaterOrEqual(amount);
     }
 
     @Override

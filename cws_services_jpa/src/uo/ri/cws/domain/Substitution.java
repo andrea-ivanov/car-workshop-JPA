@@ -1,7 +1,5 @@
 package uo.ri.cws.domain;
 
-import java.util.Objects;
-
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 
@@ -31,7 +29,12 @@ public class Substitution {
 		// Validate input parameters
 		// assignations
 		// link the substitution with the intervention and spare part (atomiclink)
-		throw new UnsupportedOperationException("Not implemented yet");
+		ArgumentChecks.isNotNull(sparePart, "Pieza de repuesto no válida");
+		ArgumentChecks.isNotNull(intervention, "Intervención no válida");
+		ArgumentChecks.isTrue(quantity > 0, "Cantidad no válida");
+		this.quantity = quantity;
+		this.price = sparePart.getPrice().roundToCents();
+		Associations.PerformsSubstitutes.atomicLink(intervention, this, sparePart);
 	}
 
 	// ---------------------------- Association helpers
@@ -47,7 +50,7 @@ public class Substitution {
 
 	// ---------------------------- Business methods -----------------------------
 	public Money getTotalAmount() {
-		throw new UnsupportedOperationException("Not implemented yet");
+		return Money.calc(price).times(quantity).toMoneyRoundedToCents();
 	}
 
 	public Money getPrice() {

@@ -20,7 +20,16 @@ public class Charge {
         // store the amount rounded to cents
         // increments the paymentMean accumulated -> paymentMean.charge( amount )
         // links invoice, this and paymentMean
-        throw new UnsupportedOperationException("Not yet implemented");
+        ArgumentChecks.isNotNull(invoice);
+        ArgumentChecks.isNotNull(paymentMean);
+        ArgumentChecks.isNotNull(amount);
+
+        Money normalized = Money.calc(amount).toMoneyRoundedToCents();
+        ArgumentChecks.isTrue(normalized.greaterThan((Money.ZERO)), "El importe debe ser positivo");
+
+        paymentMean.charge(normalized);
+        this.amount = normalized;
+        Associations.SettlesWithdraws.atomicLink(invoice, this, paymentMean);
     }
 
     // ---- Getters ----
@@ -45,7 +54,9 @@ public class Charge {
      */
     /* package */ void rewind() {
         // decrements the payment mean accumulated ( paymentMean.rewind( amount) )
-        throw new UnsupportedOperationException("Not yet implemented");
+        StateChecks.isTrue(invoice != null && paymentMean != null, "El cargo ya había sido devuelto");
+        paymentMean.rewind(amount);
+        Associations.SettlesWithdraws.atomicUnlink(this);
     }
 
     // ---- Association helpers ----

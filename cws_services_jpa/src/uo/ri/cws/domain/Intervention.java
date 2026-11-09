@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import uo.ri.cws.domain.types.Money;
@@ -59,7 +58,17 @@ public class Intervention {
 		// Truncate the date to milliseconds to avoid precision issues
 		// links the intervention with the work order and mechanic (atomiclink)
 		// For each substitution in the map, add it to the intervention
-		throw new UnsupportedOperationException("Not implemented yet");
+		ArgumentChecks.isNotNull(mechanic, "Mecánico no válido");
+		ArgumentChecks.isNotNull(workOrder, "Orden de trabajo no válida");
+		ArgumentChecks.isNotNull(date);
+		ArgumentChecks.isTrue(minutes >= 0, "Tiempo no válido");
+		validateSubstitutions(substitutions);
+
+		this.date = date.truncatedTo(ChronoUnit.MILLIS);
+		this.minutes = minutes;
+
+		Associations.RecordsIntervenes.atomicLink(workOrder, this, mechanic);
+		substitutions.forEach(this::addSubstitution);
 	}
 
 	// ---------------------------- Association helpers
@@ -83,7 +92,9 @@ public class Intervention {
 	// ---------------------------- Business methods -----------------------------
 
 	/* package */ void removeSubstitutions() {
-		throw new UnsupportedOperationException("Not implemented yet");
+		for (Substitution substitution : new HashSet<>(substitutions)) {
+			Associations.PerformsSubstitutes.atomicUnlink(substitution);
+		}
 	}
 
 	/**
@@ -110,7 +121,11 @@ public class Intervention {
 	}
 
 	private Money calculateSparesAmount() {
-		throw new UnsupportedOperationException("Not implemented yet");
+		Money.MoneyCalculator calculator = Money.calc();
+		for (Substitution substitution : substitutions) {
+			calculator.add(substitution.getTotalAmount());
+		}
+		return calculator.toMoneyExact();
 	}
 
 	private void addSubstitution(SparePart sparePart, int quantity) {
@@ -118,7 +133,12 @@ public class Intervention {
 	}
 
 	private static void validateSubstitutions(Map<SparePart, Integer> substitutions) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		ArgumentChecks.isNotNull(substitutions, "Las sustituciones no pueden ser nulas");
+		substitutions.forEach((sparePart, quantity) -> {
+			ArgumentChecks.isNotNull(sparePart, "La pieza de repuesto no puede ser nula");
+			ArgumentChecks.isNotNull(quantity, "La pieza de sustitución no puede ser nula");
+			ArgumentChecks.isTrue(quantity > 0, "La cantidad de repuestos debe ser positiva");
+		});
 	}
 
 	public LocalDateTime getDate() {

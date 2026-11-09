@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import uo.ri.cws.domain.types.Money;
@@ -52,7 +51,14 @@ public class WorkOrder {
         // Truncate the date to milliseconds to avoid precision issues
         // Link the work order with the vehicle
 
-        throw new UnsupportedOperationException("Not implemented yet");
+        ArgumentChecks.isNotNull(vehicle, "El vehículo no puede ser nulo");
+        ArgumentChecks.isNotNull(date, "La fecha no puede ser nula");
+        ArgumentChecks.isNotBlank(description, "Descripción no válida");
+
+        this.date = date.truncatedTo(ChronoUnit.MILLIS);
+        this.description = description;
+
+        Associations.Fixes.link(vehicle, this);
     }
 
     // ---- Getters ----
@@ -140,7 +146,10 @@ public class WorkOrder {
      * @throws IllegalStateException if The work order is not in OPEN state
      */
     public void assignTo(Mechanic mechanic) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        ArgumentChecks.isNotNull(mechanic, "El mecánico no puede ser nulo");
+        StateChecks.isTrue(isOpen(), "Solo se puede asignar si el estado es OPEN");
+        Associations.Assigns.link(mechanic, this);
+        this.state = WorkOrderState.ASSIGNED;
     }
 
     /**
@@ -151,7 +160,9 @@ public class WorkOrder {
      * @throws IllegalStateException if The work order is not in ASSIGNED state
      */
     public void unassign() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        StateChecks.isTrue(isAssigned(), "No hay orden de trabajo asignada.");
+        Associations.Assigns.unlink(this);
+        this.state = WorkOrderState.OPEN;
     }
 
     /**
@@ -162,7 +173,9 @@ public class WorkOrder {
      * @throws IllegalStateException if the work order is not in ASSIGNED state
      */
     public void finish() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        StateChecks.isTrue(isAssigned(), "No hay orden de trabajo asignada.");
+        Associations.Assigns.unlink(this);
+        this.state = WorkOrderState.FINISHED;
     }
 
     /**
@@ -173,7 +186,9 @@ public class WorkOrder {
      * @throws IllegalStateException if the work order is not in FINISHED state
      */
     public void approve() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        StateChecks.isTrue(isFinished(), "La orden de trabajo no está ternimada");
+        this.amount = computeAmount();
+        this.state = WorkOrderState.APPROVED;
     }
 
     /**
@@ -184,7 +199,9 @@ public class WorkOrder {
      *                               if it has no invoice assigned
      */
     public void invoice() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        StateChecks.isTrue(isApproved(), "La orden de trabajo no está aprobada.");
+        StateChecks.isTrue(invoice != null, "No hay factura asignada.");
+        this.state = WorkOrderState.INVOICED;
     }
 
     /**
@@ -194,7 +211,9 @@ public class WorkOrder {
      * @throws IllegalStateException if the work order is not in APPROVED state
      */
     public void unapprove() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        StateChecks.isTrue(isApproved(), "La orden de trabajo no está aprobada");
+        this.state = WorkOrderState.FINISHED;
+        this.amount = Money.ZERO;
     }
 
     /**
@@ -204,7 +223,8 @@ public class WorkOrder {
      * @throws IllegalStateException if the work order is not in INVOICED state
      */
     public void uninvoice() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        StateChecks.isTrue(isInvoiced(), "La orden de trabajo no está facturada");
+        this.state = WorkOrderState.APPROVED;
     }
 
     /**
@@ -214,7 +234,8 @@ public class WorkOrder {
      * @throws IllegalStateException if the work order is not in FINISHED state
      */
     public void reopen() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        StateChecks.isTrue(isFinished(), "La orden de trabajo debe estar cerrdad");
+        this.state = WorkOrderState.OPEN;
     }
 
     // ---- Intervention management ----
@@ -285,7 +306,32 @@ public class WorkOrder {
         // intervention
         // truncate the date to milliseconds to avoid precision issues
         // Create a new Intervention (that auto links it to the work order and mechanic)
-        throw new UnsupportedOperationException("Not implemented yet");
+        ArgumentChecks.isNotNull(mechanic, "El mecánico no puede ser nulo");
+        ArgumentChecks.isNotNull(date, "La fecha no puede ser nula");
+        ArgumentChecks.isTrue(minutes >= 0, "El tiempo debe ser mayor que cero.");
+        ArgumentChecks.isNotNull(substitutions, "Las sustituciones no pueden ser nulas");
+
+        StateChecks.isTrue(isAssigned() || isFinished(), "La orden de trabajo debe estar asignada o finalizada");
+        LocalDateTime truncated = date.truncatedTo(ChronoUnit.MILLIS);
+        StateChecks.isFalse(checkIsInterventionDuplicated(truncated, mechanic),
+                "Ya existe una intervención con este mecánico y fecha");
+
+        new Intervention(mechanic, this, truncated, minutes, substitutions);
+    }
+
+    /**
+     * Comprueba si la intervención está duplicada.
+     * 
+     * @param date
+     */
+    private boolean checkIsInterventionDuplicated(LocalDateTime truncated, Mechanic mechanic) {
+        for (Intervention i : interventions) {
+            if (i.getMechanic().equals(mechanic) && i.getDate().equals(truncated))
+                return true;
+        }
+
+        return false;
+
     }
 
     public void removeIntervention(Intervention intervention) {
@@ -298,8 +344,15 @@ public class WorkOrder {
     }
 
     // ---- Amount calculation ----
-    private void computeAmount() {
-        throw new UnsupportedOperationException("Not implemented yet");
+    /**
+     * Suma el importe de todas las intervenciones redondeando a los céntimos
+     */
+    private Money computeAmount() {
+        Money.MoneyCalculator calculator = Money.calc();
+        for (Intervention intervention : interventions) {
+            calculator.add(intervention.getTotalAmount());
+        }
+        return calculator.toMoneyRoundedToCents();
     }
 
     @Override
@@ -336,7 +389,7 @@ public class WorkOrder {
     @Override
     public String toString() {
         return "WorkOrder [date=" + date + ", description=" + description + ", amount=" + amount + ", state=" + state
-                + ", vehicle=" + vehicle + "]";
+                + "]";
     }
 
 }

@@ -2,7 +2,6 @@ package uo.ri.cws.domain;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.Objects;
 
 import uo.ri.cws.domain.types.CreditCardNumber;
 import uo.ri.cws.domain.types.Money;
@@ -35,7 +34,8 @@ public class CreditCard extends PaymentMean {
      */
     @Override
     public boolean canBeCharged(Money amount) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        checkPositive(amount);
+        return isValidNow();
     }
 
     public CreditCardNumber getNumber() {

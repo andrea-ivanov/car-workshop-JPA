@@ -1,7 +1,6 @@
 package uo.ri.cws.domain;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import uo.ri.cws.domain.types.LicensePlate;

@@ -1,7 +1,5 @@
 package uo.ri.cws.domain;
 
-import java.util.Objects;
-
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 

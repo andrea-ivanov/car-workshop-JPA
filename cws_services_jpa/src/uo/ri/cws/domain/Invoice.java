@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import uo.ri.cws.domain.types.Money;
@@ -55,13 +54,11 @@ public class Invoice {
 	// ----------------- Constructors -------------------------------------
 
 	public Invoice(long number) {
-		// call full constructor with sensible defaults
-		throw new UnsupportedOperationException("Not implemented yet");
+		this(number, LocalDate.now(), List.of());
 	}
 
 	public Invoice(long number, LocalDate date) {
-		// call full constructor with sensible defaults
-		throw new UnsupportedOperationException("Not implemented yet");
+		this(number, date, List.of());
 	}
 
 	public Invoice(long number, List<WorkOrder> workOrders) {
@@ -72,7 +69,21 @@ public class Invoice {
 		// check arguments (always), through IllegalArgumentException
 		// store the number
 		// add every work order calling addWorkOrder( w )
-		throw new UnsupportedOperationException("Not implemented yet");
+		ArgumentChecks.isTrue(number >= 0, "El número debe ser positivo");
+		ArgumentChecks.isNotNull(date, "La fecha no puede ser nula");
+		ArgumentChecks.isNotNull(workOrders, "La lista de ordenes de trabajo no puede ser nula");
+
+		// compruebo que no sea ninguna nula y todas aprobadas
+		for (WorkOrder wo : workOrders) {
+			ArgumentChecks.isNotNull(wo, "No puede haber ordenes de trabajo nulas");
+			StateChecks.isTrue(wo.isApproved(), "Las ordenes de trabajo deben estar aprobadas");
+		}
+
+		this.number = number;
+		this.date = date;
+
+		for (WorkOrder wo : workOrders)
+			addWorkOrder(wo);
 	}
 
 	// ---- Getters ----
@@ -131,8 +142,13 @@ public class Invoice {
 		// links the work order
 		// compute the invoice amount after adding the work order
 		// marks it as invoiced
+		ArgumentChecks.isNotNull(workOrder, "La orden de trabajo no puede ser nula");
+		StateChecks.isFalse(isSettled(), "La factura ya está pagada");
+		StateChecks.isTrue(workOrder.isApproved(), "La orden de trabajo debe estar aprobada");
 
-		throw new UnsupportedOperationException("Not implemented yet");
+		Associations.Bills.link(this, workOrder);
+		workOrder.invoice();
+		computeAmount();
 	}
 
 	/**
@@ -141,7 +157,13 @@ public class Invoice {
 	 * @param workOrder
 	 */
 	public void removeWorkOrder(WorkOrder workOrder) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		ArgumentChecks.isNotNull(workOrder, "La orden de trabajo no debe ser nula");
+		StateChecks.isFalse(isSettled(), "La factura ya está pagada");
+		ArgumentChecks.isTrue(workOrders.contains(workOrder), "La orden de trabajo debe estar aprobada");
+
+		Associations.Bills.unlink(workOrder);
+		workOrder.uninvoice();
+		computeAmount();
 	}
 
 	public boolean isSettled() {
@@ -165,7 +187,24 @@ public class Invoice {
 		// mean
 		// Set the invoice state to PAID
 
-		throw new UnsupportedOperationException("Not implemented yet");
+		ArgumentChecks.isNotNull(requestedCharges, "La lista de cargos no puede ser nula");
+		ArgumentChecks.isFalse(requestedCharges.isEmpty(), "La lista de cargos no puede setar vacía");
+		StateChecks.isFalse(isSettled(), "La factura ya está pagada");
+		StateChecks.isTrue(total.greaterThan(Money.ZERO), "No se puede liquidar una factura de 0€");
+
+		Map<PaymentMean, Money> normalized = normalize(requestedCharges);
+		Money sum = chargesTotal(normalized);
+		StateChecks.isTrue(sum.equals(this.total), "El importe y los cargos no coinciden en total");
+
+		for (Map.Entry<PaymentMean, Money> entry : normalized.entrySet()) {
+			StateChecks.isTrue(entry.getKey().canBeCharged(entry.getValue()), "Un medio de pago no puede ser cobrado");
+		}
+
+		for (Map.Entry<PaymentMean, Money> entry : normalized.entrySet()) {
+			new Charge(this, entry.getKey(), entry.getValue());
+		}
+
+		this.state = InvoiceState.PAID;
 	}
 
 	public void unSettle() {
@@ -176,12 +215,21 @@ public class Invoice {
 	}
 
 	// ---- Calculation ----
+	/*
+	 * 1. Sum all work order totals = subtotal
+	 * 2. Determine VAT rate based on invoice date
+	 * 3. Compute VAT amount
+	 * 4. Compute total amount (subtotal + VAT) rounded to cents
+	 */
 	private void computeAmount() {
-		// 1. Sum all work order totals = subtotal
-		// 2. Determine VAT rate based on invoice date
-		// 3. Compute VAT amount
-		// 4. Compute total amount (subtotal + VAT) rounded to cents
-		throw new UnsupportedOperationException("Not implemented yet");
+		Money.MoneyCalculator calculator = Money.calc();
+		for (WorkOrder wo : workOrders) {
+			calculator.add(wo.getAmount());
+		}
+		this.subtotal = calculator.toMoneyRoundedToCents();
+		this.vatRate = getApplicableVatRate();
+		this.vatAmount = Money.calc(subtotal).times(vatRate.asRatio()).toMoneyRoundedToCents();
+		this.total = Money.calc(subtotal).add(vatAmount).toMoneyRoundedToCents();
 	}
 
 	private Percentage getApplicableVatRate() {
