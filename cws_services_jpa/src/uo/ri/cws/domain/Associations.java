@@ -278,4 +278,27 @@ public class Associations {
 			substitution._setSparePart(null);
 		}
 	}
+
+	public static class Recommends {
+
+		/**
+		 * Recommender one to many recommended
+		 * 
+		 * @param recommender
+		 * @param recommendation
+		 * @param recommended
+		 */
+		public static void link(Client recommender, Recommendation recommendation, Client recommended) {
+			ArgumentChecks.isNotNull(recommender, "El cliente que recomienda no puede ser nulo");
+			ArgumentChecks.isNotNull(recommendation, "La recomendacion no puede ser nula");
+			ArgumentChecks.isNotNull(recommended, "El recomendado no puede ser nulo");
+
+		}
+
+		public static void unlink(Recommendation recommendation) {
+			ArgumentChecks.isNotNull(recommendation);
+
+		}
+
+	}
 }

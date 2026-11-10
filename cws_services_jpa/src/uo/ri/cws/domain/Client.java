@@ -1,6 +1,8 @@
 package uo.ri.cws.domain;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import uo.ri.cws.domain.types.Address;
@@ -22,6 +24,7 @@ public class Client {
 	// accidentales
 	private Set<Vehicle> vehicles = new HashSet<>();
 	private Set<PaymentMean> paymentMeans = new HashSet<>();
+	private Set<Recommendation> recommendations = new HashSet<>();
 
 	public Set<Vehicle> getVehicles() {
 		return new HashSet<>(vehicles);
@@ -126,5 +129,43 @@ public class Client {
 
 	public Set<PaymentMean> getPaymentMeans() {
 		return new HashSet<>(paymentMeans);
+	}
+
+	/**
+	 * Tiene que tener una orden de trabajo facturada cuya factura haya sido pagada.
+	 * 
+	 * @return
+	 */
+	public boolean isEligibleForVoucher25() {
+		for (Vehicle v : vehicles) {
+			for (WorkOrder w : v.getWorkOrders()) {
+				if (w.isInvoiced())
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public Set<Recommendation> getRecommendations() {
+		return new HashSet<>(recommendations);
+	}
+
+	public Recommendation getRecommendation() {
+
+	}
+
+	Set<Recommendation> _getRecommendations() {
+		return this.recommendations;
+	}
+
+	void _setRecommendation(Recommendation recommendation) {
+		// TODO
+	}
+
+	public List<Recommendation> getRecommendationsAvailableForVoucher25() {
+		List<Recommendation> availableRec = new ArrayList<>();
+		for(Recommendation r : recommendations) {
+			if(r.)
+		}
 	}
 }
