@@ -29,6 +29,10 @@ tmp/
 *.swp
 *~.nib
 local.properties
+.project
+.classpath
+.settings/
+.factorypath
 
 # ==========================================
 # Otros entornos (IntelliJ / VS Code)
