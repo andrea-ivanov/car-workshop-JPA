@@ -23,6 +23,7 @@ public class Invoice {
 	private long number;
 	private LocalDate date;
 	private InvoiceState state = InvoiceState.ISSUED;
+	private boolean usedForVoucher;
 
 	/*
 	 * Subtotal amount of the invoice, before applying VAT. This represents the
@@ -130,6 +131,14 @@ public class Invoice {
 	}
 
 	// ---- Business methods --------------------------------------------
+
+	public boolean isUsedForVoucher() {
+		return usedForVoucher;
+	}
+
+	public void markAsUsedForVoucher() {
+		this.usedForVoucher = true;
+	}
 
 	/**
 	 * Adds a work order to the invoice. The work order must be approved and the
@@ -280,6 +289,10 @@ public class Invoice {
 	public String toString() {
 		return "Invoice [number=" + number + ", date=" + date + ", state=" + state + ", subtotal=" + subtotal
 				+ ", vatRate=" + vatRate + ", vatAmount=" + vatAmount + ", total=" + total + "]";
+	}
+
+	public boolean canGenerateVoucher30() {
+		return isSettled() && total.greaterThan(Money.of("500")) && !isUsedForVoucher();
 	}
 
 }

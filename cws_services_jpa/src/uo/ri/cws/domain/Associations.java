@@ -293,11 +293,37 @@ public class Associations {
 			ArgumentChecks.isNotNull(recommendation, "La recomendacion no puede ser nula");
 			ArgumentChecks.isNotNull(recommended, "El recomendado no puede ser nulo");
 
+			StateChecks.isTrue(recommendation.getRecommended() == null,
+					"La recomendación ya tiene asignado recomendado");
+			StateChecks.isTrue(recommendation.getRecommender() == null,
+					"La recomendación ya tiene asignado recomendador.");
+			StateChecks.isTrue(recommended.getRecommendation() == null, "El recomendado y ya tiene recomendador.");
+			StateChecks.isFalse(recommender.getRecommendations().contains(recommendation),
+					"El recomendador ya recomendó a este cliente");
+
+			recommendation._setRecommender(recommender);
+			recommendation._setRecommended(recommended);
+
+			recommender._getRecommendations().add(recommendation);
+			recommended._setRecommendation(recommendation);
 		}
 
 		public static void unlink(Recommendation recommendation) {
 			ArgumentChecks.isNotNull(recommendation);
 
+			Client recommender = recommendation.getRecommender();
+			Client recommended = recommendation.getRecommended();
+			StateChecks.isFalse(recommender == null, "No tiene recomendador asignado");
+			StateChecks.isFalse(recommended == null, "No tiene recomendado asignado");
+			StateChecks.isTrue(recommender.getRecommendations().contains(recommendation),
+					"El recomendador no recomienda al recomendado");
+			StateChecks.isTrue(recommendation.equals(recommended.getRecommendation()),
+					"El recomendado no es recomendado por el recomendador");
+
+			recommender._getRecommendations().remove(recommendation);
+			recommended._setRecommendation(null);
+			recommendation._setRecommender(null);
+			recommendation._setRecommended(null);
 		}
 
 	}

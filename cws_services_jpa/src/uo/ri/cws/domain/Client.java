@@ -11,6 +11,7 @@ import uo.ri.cws.domain.types.FullName;
 import uo.ri.cws.domain.types.Nif;
 import uo.ri.cws.domain.types.PhoneNumber;
 import uo.ri.util.assertion.ArgumentChecks;
+import uo.ri.util.assertion.StateChecks;
 
 public class Client {
 
@@ -24,7 +25,9 @@ public class Client {
 	// accidentales
 	private Set<Vehicle> vehicles = new HashSet<>();
 	private Set<PaymentMean> paymentMeans = new HashSet<>();
-	private Set<Recommendation> recommendations = new HashSet<>();
+
+	private Recommendation recommended; // un cliente puede recibir solo una recomendación
+	private Set<Recommendation> recommendations = new HashSet<>(); // un cliente puede recomendar 0..*
 
 	public Set<Vehicle> getVehicles() {
 		return new HashSet<>(vehicles);
@@ -137,9 +140,18 @@ public class Client {
 	 * @return
 	 */
 	public boolean isEligibleForVoucher25() {
+		return hasPaidWorkOrders() && getRecommendationsAvailableForVoucher25().size() >= 3;
+	}
+
+	/**
+	 * Devuelve si hay ordenes de trabajo facturadas pagadas.
+	 * 
+	 * @return
+	 */
+	private boolean hasPaidWorkOrders() {
 		for (Vehicle v : vehicles) {
 			for (WorkOrder w : v.getWorkOrders()) {
-				if (w.isInvoiced())
+				if (w.isInvoiced() && w.getInvoice() != null && w.getInvoice().isSettled())
 					return true;
 			}
 		}
@@ -151,7 +163,7 @@ public class Client {
 	}
 
 	public Recommendation getRecommendation() {
-
+		return this.recommended;
 	}
 
 	Set<Recommendation> _getRecommendations() {
@@ -159,13 +171,52 @@ public class Client {
 	}
 
 	void _setRecommendation(Recommendation recommendation) {
-		// TODO
+		this.recommended = recommendation;
 	}
 
+	/**
+	 * Lista de recomendaciones disponibles para bono 25
+	 * 
+	 * @return
+	 */
 	public List<Recommendation> getRecommendationsAvailableForVoucher25() {
 		List<Recommendation> availableRec = new ArrayList<>();
-		for(Recommendation r : recommendations) {
-			if(r.)
-		}
+		for (Recommendation r : recommendations)
+			if (!r.isUsedForVoucher() && r.getRecommended().hasPaidWorkOrders())
+				availableRec.add(r);
+		return availableRec;
 	}
+
+	public void markThreeRecommendationsAsUsedForVoucher25() {
+		List<Recommendation> availables = getRecommendationsAvailableForVoucher25();
+		StateChecks.isTrue(availables.size() >= 3, "Se requiren al menos 3 recomendaciones para el bono de 25");
+		for (int i = 0; i < 3; i++)
+			availables.get(i).markAsUsedForVoucher();
+	}
+
+	public List<WorkOrder> getWorkOrdersAvailableForVoucher20() {
+		List<WorkOrder> availables = new ArrayList<>();
+		for (Vehicle v : vehicles) {
+			for (WorkOrder w : v.getWorkOrders()) {
+				if (isValidWorkOrderFor20(w))
+					availables.add(w);
+			}
+		}
+		return availables;
+	}
+
+	private boolean isValidWorkOrderFor20(WorkOrder w) {
+		return w.isInvoiced()
+				&& w.getInvoice() != null
+				&& w.getInvoice().isSettled()
+				&& !w.isUsedForVoucher();
+	}
+
+	public void markThreeWorkOrdersAsUsedForVoucher20() {
+		List<WorkOrder> availables = getWorkOrdersAvailableForVoucher20();
+		StateChecks.isTrue(availables.size() >= 3, "Se requiren al menos 3 ordenes de trabajo para el bono de 20");
+		for (int i = 0; i < 3; i++)
+			availables.get(i).markAsUsedForVoucher();
+	}
+
 }

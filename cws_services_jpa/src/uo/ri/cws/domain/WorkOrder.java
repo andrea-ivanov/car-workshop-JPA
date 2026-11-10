@@ -25,6 +25,7 @@ public class WorkOrder {
     private String description;
     private Money amount = Money.ZERO; // cents
     private WorkOrderState state = WorkOrderState.OPEN;
+    private boolean usedForVoucher;
 
     // Accidental attributes
     private Invoice invoice;
@@ -390,6 +391,14 @@ public class WorkOrder {
     public String toString() {
         return "WorkOrder [date=" + date + ", description=" + description + ", amount=" + amount + ", state=" + state
                 + "]";
+    }
+
+    public boolean isUsedForVoucher() {
+        return usedForVoucher;
+    }
+
+    public void markAsUsedForVoucher() {
+        this.usedForVoucher = true;
     }
 
 }
