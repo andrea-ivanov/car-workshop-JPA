@@ -17,19 +17,16 @@ import uo.ri.cws.domain.types.Nif;
 
 /**
  * Scenarios:
- * - Linking a recommender, a recommendation and a recommended client updates
- * all association ends
+ * - Linking a recommender, a recommendation and a recommended client updates all association ends
  * - Unlinking a recommendation removes the link from all association ends
  * - The collection returned by getRecommendations() is a safe copy
- * - Linking a new recommendation adds it without removing existing
- * recommendations
+ * - Linking a new recommendation adds it without removing existing recommendations
  * - Linking rejects a null recommender
  * - Linking rejects a null recommendation
  * - Linking rejects a null recommended client
  * - Linking rejects a recommendation that already has a recommender
  * - Linking rejects a recommendation that already has a recommended client
- * - Linking rejects a recommendation already present in the recommender's
- * recommendations
+ * - Linking rejects a recommendation already present in the recommender's recommendations
  * - Linking rejects a recommended client that already has a recommendation
  * - Unlinking rejects a null recommendation
  * - Unlinking rejects a recommendation without a recommender
@@ -45,11 +42,13 @@ class AssociationsRecommendsTests {
 	@BeforeEach
 	void setUp() {
 		recommender = new Client(
-				new Nif("12345678Z"),
-				new FullName("Recommender", "Client"));
+			new Nif("12345678Z"),
+			new FullName("Recommender", "Client")
+		);
 		recommended = new Client(
-				new Nif("87654321X"),
-				new FullName("Recommended", "Client"));
+			new Nif("87654321X"),
+			new FullName("Recommended", "Client")
+		);
 		recommendation = new Recommendation(recommender, recommended);
 		Associations.Recommends.unlink(recommendation);
 	}
@@ -113,8 +112,9 @@ class AssociationsRecommendsTests {
 	@Test
 	void testLinkSeveralRecommendations() {
 		Client anotherRecommended = new Client(
-				new Nif("11111111H"),
-				new FullName("Another", "Client"));
+			new Nif("11111111H"),
+			new FullName("Another", "Client")
+		);
 		Recommendation another = new Recommendation(recommender, anotherRecommended);
 		Associations.Recommends.unlink(another);
 		Associations.Recommends.link(recommender, recommendation, recommended);
@@ -136,8 +136,9 @@ class AssociationsRecommendsTests {
 	@Test
 	void testLinkNullRecommender() {
 		assertThrows(
-				IllegalArgumentException.class,
-				() -> Associations.Recommends.link(null, recommendation, recommended));
+			IllegalArgumentException.class,
+			() -> Associations.Recommends.link(null, recommendation, recommended)
+		);
 
 		assertUnlinked();
 	}
@@ -151,8 +152,9 @@ class AssociationsRecommendsTests {
 	@Test
 	void testLinkNullRecommendation() {
 		assertThrows(
-				IllegalArgumentException.class,
-				() -> Associations.Recommends.link(recommender, null, recommended));
+			IllegalArgumentException.class,
+			() -> Associations.Recommends.link(recommender, null, recommended)
+		);
 
 		assertTrue(recommender.getRecommendations().isEmpty());
 		assertNull(recommended.getRecommendation());
@@ -167,8 +169,9 @@ class AssociationsRecommendsTests {
 	@Test
 	void testLinkNullRecommended() {
 		assertThrows(
-				IllegalArgumentException.class,
-				() -> Associations.Recommends.link(recommender, recommendation, null));
+			IllegalArgumentException.class,
+			() -> Associations.Recommends.link(recommender, recommendation, null)
+		);
 
 		assertTrue(recommender.getRecommendations().isEmpty());
 		assertNull(recommendation.getRecommender());
@@ -186,8 +189,9 @@ class AssociationsRecommendsTests {
 		recommendation._setRecommender(recommender);
 
 		assertThrows(
-				IllegalStateException.class,
-				() -> Associations.Recommends.link(recommender, recommendation, recommended));
+			IllegalStateException.class,
+			() -> Associations.Recommends.link(recommender, recommendation, recommended)
+		);
 
 		assertSame(recommender, recommendation.getRecommender());
 		assertNull(recommendation.getRecommended());
@@ -206,8 +210,9 @@ class AssociationsRecommendsTests {
 		recommendation._setRecommended(recommended);
 
 		assertThrows(
-				IllegalStateException.class,
-				() -> Associations.Recommends.link(recommender, recommendation, recommended));
+			IllegalStateException.class,
+			() -> Associations.Recommends.link(recommender, recommendation, recommended)
+		);
 
 		assertNull(recommendation.getRecommender());
 		assertSame(recommended, recommendation.getRecommended());
@@ -226,8 +231,9 @@ class AssociationsRecommendsTests {
 		recommender._getRecommendations().add(recommendation);
 
 		assertThrows(
-				IllegalStateException.class,
-				() -> Associations.Recommends.link(recommender, recommendation, recommended));
+			IllegalStateException.class,
+			() -> Associations.Recommends.link(recommender, recommendation, recommended)
+		);
 
 		assertTrue(recommender.getRecommendations().contains(recommendation));
 		assertNull(recommendation.getRecommender());
@@ -244,13 +250,15 @@ class AssociationsRecommendsTests {
 	@Test
 	void testLinkRecommendedWithRecommendation() {
 		Client anotherRecommender = new Client(
-				new Nif("11111111H"),
-				new FullName("Another", "Recommender"));
+			new Nif("11111111H"),
+			new FullName("Another", "Recommender")
+		);
 		Recommendation existing = new Recommendation(anotherRecommender, recommended);
 
 		assertThrows(
-				IllegalStateException.class,
-				() -> Associations.Recommends.link(recommender, recommendation, recommended));
+			IllegalStateException.class,
+			() -> Associations.Recommends.link(recommender, recommendation, recommended)
+		);
 
 		assertSame(existing, recommended.getRecommendation());
 		assertTrue(anotherRecommender.getRecommendations().contains(existing));
@@ -267,8 +275,9 @@ class AssociationsRecommendsTests {
 	@Test
 	void testUnlinkNullRecommendation() {
 		assertThrows(
-				IllegalArgumentException.class,
-				() -> Associations.Recommends.unlink(null));
+			IllegalArgumentException.class,
+			() -> Associations.Recommends.unlink(null)
+		);
 	}
 
 	/**
@@ -280,8 +289,9 @@ class AssociationsRecommendsTests {
 	@Test
 	void testUnlinkRecommendationWithoutRecommender() {
 		assertThrows(
-				IllegalStateException.class,
-				() -> Associations.Recommends.unlink(recommendation));
+			IllegalStateException.class,
+			() -> Associations.Recommends.unlink(recommendation)
+		);
 
 		assertUnlinked();
 	}
@@ -298,8 +308,9 @@ class AssociationsRecommendsTests {
 		recommender._getRecommendations().add(recommendation);
 
 		assertThrows(
-				IllegalStateException.class,
-				() -> Associations.Recommends.unlink(recommendation));
+			IllegalStateException.class,
+			() -> Associations.Recommends.unlink(recommendation)
+		);
 
 		assertSame(recommender, recommendation.getRecommender());
 		assertNull(recommendation.getRecommended());
@@ -319,8 +330,9 @@ class AssociationsRecommendsTests {
 		recommended._setRecommendation(recommendation);
 
 		assertThrows(
-				IllegalStateException.class,
-				() -> Associations.Recommends.unlink(recommendation));
+			IllegalStateException.class,
+			() -> Associations.Recommends.unlink(recommendation)
+		);
 
 		assertSame(recommender, recommendation.getRecommender());
 		assertSame(recommended, recommendation.getRecommended());
@@ -344,8 +356,9 @@ class AssociationsRecommendsTests {
 		recommended._setRecommendation(another);
 
 		assertThrows(
-				IllegalStateException.class,
-				() -> Associations.Recommends.unlink(recommendation));
+			IllegalStateException.class,
+			() -> Associations.Recommends.unlink(recommendation)
+		);
 
 		assertSame(recommender, recommendation.getRecommender());
 		assertSame(recommended, recommendation.getRecommended());
