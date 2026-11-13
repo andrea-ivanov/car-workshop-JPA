@@ -2,19 +2,20 @@ package uo.ri.cws.domain.types;
 
 import java.text.Normalizer;
 
+import jakarta.persistence.Embeddable;
 import uo.ri.util.assertion.ArgumentChecks;
 
-public record FullName ( 
-		String name,
-		String surname
-	){
+@Embeddable
+public record FullName(
+        String name,
+        String surname) {
 
     public FullName {
         name = normalize(name);
         surname = normalize(surname);
 
         ArgumentChecks.isTrue(isValid(name, surname), "Name and surname cannot be empty");
-   }
+    }
 
     /**
      * Normalizes a raw name/surname: trims, collapses inner whitespace

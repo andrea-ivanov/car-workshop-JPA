@@ -3,18 +3,31 @@ package uo.ri.cws.domain;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.cws.domain.types.FullName;
 import uo.ri.cws.domain.types.Nif;
 import uo.ri.util.assertion.ArgumentChecks;
 
-public class Mechanic {
+@Entity
+@Table(name = "TMECHANICS")
+public class Mechanic extends BaseEntity {
 
 	// Natural attributes
+	@AttributeOverride(name = "nif", column = @Column(unique = true))
 	private Nif nif;
 	private FullName fullName;
 
 	// Accidental attributes
+	@OneToMany(mappedBy = "mechanic")
 	private Set<WorkOrder> assigned = new HashSet<>();
+
+	protected Mechanic() {
+	}
 
 	public Mechanic(Nif nif) {
 		this(nif, new FullName("No name", "No surname"));
@@ -51,31 +64,6 @@ public class Mechanic {
 
 	public FullName getFullName() {
 		return fullName;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((nif == null) ? 0 : nif.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Mechanic other = (Mechanic) obj;
-		if (nif == null) {
-			if (other.nif != null)
-				return false;
-		} else if (!nif.equals(other.nif))
-			return false;
-		return true;
 	}
 
 	@Override

@@ -1,13 +1,13 @@
 package uo.ri.cws.domain.types;
 
-
 import java.util.regex.Pattern;
 
+import jakarta.persistence.Embeddable;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Embeddable
 public record Nif(
-		String nif
-	) {
+        String nif) {
 
     private static final String LETTERS = "TRWAGMYFPDXBNJZSQVHLCKE";
     private static final Pattern PATTERN = Pattern.compile("^[0-9XYZ][0-9]{7}[A-Z]$");
@@ -25,7 +25,8 @@ public record Nif(
     }
 
     /**
-     * Pre-validates a raw NIF/NIE (format and checksum) before constructing the object.
+     * Pre-validates a raw NIF/NIE (format and checksum) before constructing the
+     * object.
      */
     public static boolean isValid(String nif) {
         if (nif == null) {

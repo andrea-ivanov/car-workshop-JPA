@@ -2,15 +2,17 @@ package uo.ri.cws.domain.types;
 
 import java.util.regex.Pattern;
 
+import jakarta.persistence.Embeddable;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Embeddable
 public record Email(String email) {
 
     private static final Pattern SIMPLE_EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
 
     public Email {
         email = normalize(email);
-    	ArgumentChecks.isTrue(isValid(email), "Invalid email format");
+        ArgumentChecks.isTrue(isValid(email), "Invalid email format");
     }
 
     /**

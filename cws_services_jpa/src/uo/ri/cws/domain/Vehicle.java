@@ -3,31 +3,39 @@ package uo.ri.cws.domain;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.cws.domain.types.LicensePlate;
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 
-public class Vehicle {
+@Entity
+@Table(name = "TVEHICLES")
+public class Vehicle extends BaseEntity {
 
 	// Natural attributes
+	@AttributeOverride(name = "licensePlate", column = @Column(unique = true))
 	private LicensePlate licensePlate;
 	private String make;
 	private String model;
 
 	// Accidental attributes
+	@ManyToOne
 	private VehicleType vehicleType;
+	@ManyToOne
 	private Client client;
+	@OneToMany(mappedBy = "vehicle")
 	private Set<WorkOrder> workOrders = new HashSet<>();
 
-	public Client getClient() {
-		return client;
-	}
-
-	void _setClient(Client client) {
-		this.client = client;
-	}
-
 	// ---- Constructors ----
+	protected Vehicle() {
+	}
+
 	public Vehicle(LicensePlate plateNumber) {
 		this(plateNumber, "no make", "no model");
 	}
@@ -39,6 +47,14 @@ public class Vehicle {
 		this.licensePlate = plateNumber;
 		this.make = make;
 		this.model = model;
+	}
+
+	public Client getClient() {
+		return client;
+	}
+
+	void _setClient(Client client) {
+		this.client = client;
 	}
 
 	public Money getPricePerHour() {
@@ -55,31 +71,6 @@ public class Vehicle {
 
 	public String getModel() {
 		return model;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((licensePlate == null) ? 0 : licensePlate.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Vehicle other = (Vehicle) obj;
-		if (licensePlate == null) {
-			if (other.licensePlate != null)
-				return false;
-		} else if (!licensePlate.equals(other.licensePlate))
-			return false;
-		return true;
 	}
 
 	/**

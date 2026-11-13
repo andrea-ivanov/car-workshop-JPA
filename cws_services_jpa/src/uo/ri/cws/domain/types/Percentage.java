@@ -2,13 +2,14 @@ package uo.ri.cws.domain.types;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.Embeddable;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Embeddable
 public record Percentage(
-		BigDecimal value
-	) {
-    
-	private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
+        BigDecimal value) {
+
+    private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
 
     public Percentage {
         value = normalize(value);
@@ -34,9 +35,9 @@ public record Percentage(
      * Creates a percentage from its percentage representation.
      * The supplied value is interpreted as a percentage, not as a ratio.
      * For example:
-     *    - 21 represents 21%
-     *    - 100 represents 100%
-     *    - 150 represents 150%
+     * - 21 represents 21%
+     * - 100 represents 100%
+     * - 150 represents 150%
      *
      * @param percent the percentage value
      * @return the corresponding percentage
@@ -67,7 +68,7 @@ public record Percentage(
     public static Percentage ofRatio(String ratio) {
         return ofRatio(new BigDecimal(ratio));
     }
-    
+
     public BigDecimal asRatio() {
         return value.divide(ONE_HUNDRED);
     }

@@ -1,16 +1,28 @@
 package uo.ri.cws.domain;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import uo.ri.cws.domain.types.Money;
 import uo.ri.cws.domain.types.VoucherCode;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Entity
+@Table(name = "TVOUCHERS")
 public class Voucher extends PaymentMean {
 
+    @AttributeOverride(name = "code", column = @Column(unique = true))
     private VoucherCode code;
     private String description;
+    @AttributeOverride(name = "amount", column = @Column(name = "AVAILABLE", precision = 19, scale = 2))
     private Money availableAmount; // cents
 
     // ---- Constructors ----
+    protected Voucher() {
+
+    }
+
     public Voucher(VoucherCode code, Money available) {
         this(code, "no-description", available);
     }
@@ -68,31 +80,6 @@ public class Voucher extends PaymentMean {
     public boolean canBeCharged(Money amount) {
         checkPositive(amount);
         return availableAmount.greaterOrEqual(amount);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((code == null) ? 0 : code.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Voucher other = (Voucher) obj;
-        if (code == null) {
-            if (other.code != null)
-                return false;
-        } else if (!code.equals(other.code))
-            return false;
-        return true;
     }
 
     @Override

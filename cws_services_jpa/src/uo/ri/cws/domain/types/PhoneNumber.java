@@ -2,11 +2,12 @@ package uo.ri.cws.domain.types;
 
 import java.util.regex.Pattern;
 
+import jakarta.persistence.Embeddable;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Embeddable
 public record PhoneNumber(
-		String phone
-	) {
+        String phone) {
 
     // E.164: + followed by 7 to 15 digits (country code + subscriber number)
     private static final Pattern PATTERN = Pattern.compile("^\\+[1-9]\\d{6,14}$");
@@ -26,13 +27,13 @@ public record PhoneNumber(
             return null;
         }
         String s = v.trim();
-        if (s.startsWith("00")) {           // 0034... -> +34...
+        if (s.startsWith("00")) { // 0034... -> +34...
             s = "+" + s.substring(2);
         }
         if (s.startsWith("+")) {
             return "+" + s.substring(1).replaceAll("\\D", "");
         }
-        return s.replaceAll("\\D", "");     // if no prefix will fail validation
+        return s.replaceAll("\\D", ""); // if no prefix will fail validation
     }
 
     /**

@@ -1,5 +1,12 @@
 package uo.ri.cws.domain;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 
@@ -10,16 +17,27 @@ import uo.ri.util.assertion.ArgumentChecks;
  * Internal aggregate class of WorkOrder. Only Intervention can create
  * Substitutions (through WorkOrder).
  */
-public class Substitution {
+@Entity
+@Table(name = "TSUBSTITUTIONS", uniqueConstraints = @UniqueConstraint(columnNames = { "INTERVENTION_ID",
+		"SPAREPART_ID" }))
+public class Substitution extends BaseEntity {
 	// Natural attributes
+	@AttributeOverride(name = "amount", column = @Column(name = "price", precision = 19, scale = 2))
 	private Money price;
 	private int quantity;
 
 	// Accidental attributes
+	@ManyToOne
 	private SparePart sparePart;
+	@ManyToOne
 	private Intervention intervention;
 
 	// ---------------------------- Constructors -----------------------------
+
+	protected Substitution() {
+
+	}
+
 	/**
 	 * Package-private constructor to create a new Substitution with the given
 	 * parameters.
@@ -67,37 +85,6 @@ public class Substitution {
 
 	public Intervention getIntervention() {
 		return intervention;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((sparePart == null) ? 0 : sparePart.hashCode());
-		result = prime * result + ((intervention == null) ? 0 : intervention.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Substitution other = (Substitution) obj;
-		if (sparePart == null) {
-			if (other.sparePart != null)
-				return false;
-		} else if (!sparePart.equals(other.sparePart))
-			return false;
-		if (intervention == null) {
-			if (other.intervention != null)
-				return false;
-		} else if (!intervention.equals(other.intervention))
-			return false;
-		return true;
 	}
 
 	@Override

@@ -6,6 +6,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 
@@ -14,17 +21,26 @@ import uo.ri.util.assertion.ArgumentChecks;
  * Internal aggregate class of WorkOrder. Only WorkOrder can create
  * Interventions.
  */
-public class Intervention {
+@Entity
+@Table(name = "TINTERVENTIONS", uniqueConstraints = @UniqueConstraint(columnNames = { "MECHANIC_ID", "WORKORDER_ID",
+		"DATE" }))
+public class Intervention extends BaseEntity {
 	// Natural attributes
 	private LocalDateTime date;
 	private int minutes;
 
 	// Accidental attributes
+	@ManyToOne
 	private WorkOrder workOrder;
+	@ManyToOne
 	private Mechanic mechanic;
+	@OneToMany(mappedBy = "intervention", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Substitution> substitutions = new HashSet<>();
 
 	// ---------------------------- Constructors -----------------------------
+	protected Intervention() {
+	}
+
 	/**
 	 * All these constructors are package-private
 	 * Only WorkOrder (aggregate root) can create Interventions
@@ -155,43 +171,6 @@ public class Intervention {
 
 	public Mechanic getMechanic() {
 		return mechanic;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((date == null) ? 0 : date.hashCode());
-		result = prime * result + ((workOrder == null) ? 0 : workOrder.hashCode());
-		result = prime * result + ((mechanic == null) ? 0 : mechanic.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Intervention other = (Intervention) obj;
-		if (date == null) {
-			if (other.date != null)
-				return false;
-		} else if (!date.equals(other.date))
-			return false;
-		if (workOrder == null) {
-			if (other.workOrder != null)
-				return false;
-		} else if (!workOrder.equals(other.workOrder))
-			return false;
-		if (mechanic == null) {
-			if (other.mechanic != null)
-				return false;
-		} else if (!mechanic.equals(other.mechanic))
-			return false;
-		return true;
 	}
 
 	@Override

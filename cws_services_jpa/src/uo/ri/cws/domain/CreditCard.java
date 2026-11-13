@@ -3,17 +3,28 @@ package uo.ri.cws.domain;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import uo.ri.cws.domain.types.CreditCardNumber;
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Entity
+@Table(name = "TCREDITCARDS")
 public class CreditCard extends PaymentMean {
 
+    @AttributeOverride(name = "number", column = @Column(unique = true))
     private CreditCardNumber number;
     private String type;
     private LocalDate validThru;
 
     // ---- Constructors ----
+    protected CreditCard() {
+
+    }
+
     public CreditCard(CreditCardNumber number, String type, YearMonth validThru) {
         ArgumentChecks.isNotNull(number, "card number cannot be null");
         ArgumentChecks.isNotBlank(type, "card type cannot be null or blank");
@@ -48,31 +59,6 @@ public class CreditCard extends PaymentMean {
 
     public YearMonth getValidThru() {
         return YearMonth.from(validThru);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((number == null) ? 0 : number.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        CreditCard other = (CreditCard) obj;
-        if (number == null) {
-            if (other.number != null)
-                return false;
-        } else if (!number.equals(other.number))
-            return false;
-        return true;
     }
 
     @Override
