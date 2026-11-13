@@ -2,17 +2,18 @@ package uo.ri.cws.domain.types;
 
 import java.util.regex.Pattern;
 
+import jakarta.persistence.Embeddable;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Embeddable
 public record LicensePlate(
-		String licensePlate
-	) {
+        String licensePlate) {
 
     private static final Pattern PATTERN = Pattern.compile("^\\d{4}[BCDFGHJKLMNPRSTVWXYZ]{3}$");
 
     public LicensePlate {
         licensePlate = normalize(licensePlate);
-    	ArgumentChecks.isTrue(isValid(licensePlate), "Invalid plate");
+        ArgumentChecks.isTrue(isValid(licensePlate), "Invalid plate");
     }
 
     /**
@@ -38,15 +39,15 @@ public record LicensePlate(
         }
         return PATTERN.matcher(normalize(licensePlate)).matches();
     }
-    
+
     public LicensePlate(String numbers, String letters) {
-    	this(numbers + letters);
-   }
-    
+        this(numbers + letters);
+    }
+
     public LicensePlate(int numbers, String letters) {
         this(String.format("%04d", numbers) + letters);
     }
-    
+
     @Override
     public String toString() {
         return licensePlate.substring(0, 4) + " " + licensePlate.substring(4);

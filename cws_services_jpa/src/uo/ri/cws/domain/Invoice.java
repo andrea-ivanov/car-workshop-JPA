@@ -7,12 +7,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.cws.domain.types.Money;
 import uo.ri.cws.domain.types.Percentage;
 import uo.ri.util.assertion.ArgumentChecks;
 import uo.ri.util.assertion.StateChecks;
 
-public class Invoice {
+@Entity
+@Table(name = "TINVOICES")
+public class Invoice extends BaseEntity {
 	private static final LocalDate JULY_1_2012 = LocalDate.of(2012, 7, 1);
 
 	public enum InvoiceState {
@@ -20,38 +31,48 @@ public class Invoice {
 	}
 
 	// Natural attributes
+	@Column(unique = true)
 	private long number;
 	private LocalDate date;
+	@Enumerated(EnumType.STRING)
 	private InvoiceState state = InvoiceState.ISSUED;
 
 	/*
 	 * Subtotal amount of the invoice, before applying VAT. This represents the
 	 * taxable base.
 	 */
+	@AttributeOverride(name = "amount", column = @Column(name = "subtotal", precision = 19, scale = 2))
 	private Money subtotal = Money.ZERO; // cents
 
 	/*
 	 * VAT rate applied to the invoice, expressed as a percentage. Example: 21% VAT.
 	 */
+	@AttributeOverride(name = "value", column = @Column(name = "VATRATE"))
 	private Percentage vatRate = Percentage.ofPercent(21); // default to 21%
 
 	/*
 	 * VAT amount calculated from the subtotal amount. This is the tax the customer
 	 * must pay.
 	 */
+	@AttributeOverride(name = "amount", column = @Column(name = "vatAmount", precision = 19, scale = 2))
 	private Money vatAmount = Money.ZERO; // cents
 
 	/*
 	 * Total amount of the invoice including VAT. This is the final amount the
 	 * customer must pay.
 	 */
+	@AttributeOverride(name = "amount", column = @Column(name = "total", precision = 19, scale = 2))
 	private Money total = Money.ZERO; // cents
 
 	// Accidental attributes
+	@OneToMany(mappedBy = "invoice")
 	private Set<WorkOrder> workOrders = new HashSet<>();
+	@OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Charge> charges = new HashSet<>();
 
 	// ----------------- Constructors -------------------------------------
+	protected Invoice() {
+	}
 
 	public Invoice(long number) {
 		this(number, LocalDate.now(), List.of());
@@ -254,26 +275,8 @@ public class Invoice {
 		return calculator.toMoneyRoundedToCents();
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (number ^ (number >>> 32));
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Invoice other = (Invoice) obj;
-		if (number != other.number)
-			return false;
-		return true;
+	public InvoiceState getState() {
+		return state;
 	}
 
 	@Override

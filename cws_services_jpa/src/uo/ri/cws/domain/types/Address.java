@@ -1,13 +1,14 @@
 package uo.ri.cws.domain.types;
 
+import jakarta.persistence.Embeddable;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Embeddable
 public record Address(
-	    String street,
+		String street,
 		String city,
 		String country,
-		String postalCode
-	) {
+		String postalCode) {
 
 	public Address {
 		street = normalize(street);

@@ -1,11 +1,17 @@
 package uo.ri.cws.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Entity
+@Table(name = "TCASHES")
 public class Cash extends PaymentMean {
 
 	// ---- Constructors ----
+	protected Cash() {
+	}
 
 	public Cash(Client client) {
 		ArgumentChecks.isNotNull(client, "El cliente es nulo");

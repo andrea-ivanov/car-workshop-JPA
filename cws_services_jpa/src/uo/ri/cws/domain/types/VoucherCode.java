@@ -1,14 +1,15 @@
 package uo.ri.cws.domain.types;
 
+import jakarta.persistence.Embeddable;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Embeddable
 public record VoucherCode(
-		String code
-	) {
-	
+        String code) {
+
     public VoucherCode {
-		code = normalize(code);
-		ArgumentChecks.isTrue(isValid(code), "Voucher code cannot be null or blank");
+        code = normalize(code);
+        ArgumentChecks.isTrue(isValid(code), "Voucher code cannot be null or blank");
     }
 
     private static String normalize(String code) {
@@ -22,14 +23,14 @@ public record VoucherCode(
     public static VoucherCode of(String value) {
         return new VoucherCode(value);
     }
-    
+
     /**
      * @return a new VoucherCode instance with a unique code.
      */
     public static VoucherCode generate() {
-		String code = "VOUCHER-" + System.currentTimeMillis() + "-" + (int) (Math.random() * 10_000);
-		return new VoucherCode(code);
-	}
+        String code = "VOUCHER-" + System.currentTimeMillis() + "-" + (int) (Math.random() * 10_000);
+        return new VoucherCode(code);
+    }
 
     @Override
     public String toString() {

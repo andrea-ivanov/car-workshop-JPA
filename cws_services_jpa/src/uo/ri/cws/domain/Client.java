@@ -3,6 +3,12 @@ package uo.ri.cws.domain;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.cws.domain.types.Address;
 import uo.ri.cws.domain.types.Email;
 import uo.ri.cws.domain.types.FullName;
@@ -10,9 +16,12 @@ import uo.ri.cws.domain.types.Nif;
 import uo.ri.cws.domain.types.PhoneNumber;
 import uo.ri.util.assertion.ArgumentChecks;
 
-public class Client {
+@Entity
+@Table(name = "TCLIENTS")
+public class Client extends BaseEntity {
 
 	// Natural attributes
+	@AttributeOverride(name = "nif", column = @Column(unique = true))
 	private Nif nif;
 	private FullName fullName;
 	private Email email;
@@ -20,18 +29,15 @@ public class Client {
 	private Address address;
 
 	// accidentales
+	@OneToMany(mappedBy = "client")
 	private Set<Vehicle> vehicles = new HashSet<>();
+	@OneToMany(mappedBy = "client")
 	private Set<PaymentMean> paymentMeans = new HashSet<>();
 
-	public Set<Vehicle> getVehicles() {
-		return new HashSet<>(vehicles);
-	}
-
-	Set<Vehicle> _getVehicles() {
-		return vehicles;
-	}
-
 	// ---- Constructors ----
+	protected Client() {
+	}
+
 	public Client(Nif nif) {
 		this(nif,
 				new FullName("No name", "No surname"),
@@ -83,29 +89,12 @@ public class Client {
 		return address;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((nif == null) ? 0 : nif.hashCode());
-		return result;
+	public Set<Vehicle> getVehicles() {
+		return new HashSet<>(vehicles);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Client other = (Client) obj;
-		if (nif == null) {
-			if (other.nif != null)
-				return false;
-		} else if (!nif.equals(other.nif))
-			return false;
-		return true;
+	Set<Vehicle> _getVehicles() {
+		return vehicles;
 	}
 
 	/**

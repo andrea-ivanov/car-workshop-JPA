@@ -2,13 +2,15 @@ package uo.ri.cws.domain.types;
 
 import java.util.Objects;
 
+import jakarta.persistence.Embeddable;
 import uo.ri.util.assertion.ArgumentChecks;
 
+@Embeddable
 public record CreditCardNumber(String number) {
 
     public CreditCardNumber {
         number = normalize(number);
-    	ArgumentChecks.isTrue(isValid(number), "Invalid credit card");
+        ArgumentChecks.isTrue(isValid(number), "Invalid credit card");
     }
 
     /**
@@ -39,8 +41,8 @@ public record CreditCardNumber(String number) {
             if (alt) {
                 n *= 2;
                 if (n > 9) {
-					n -= 9;
-				}
+                    n -= 9;
+                }
             }
 
             sum += n;
@@ -60,9 +62,9 @@ public record CreditCardNumber(String number) {
     }
 
     public String number() {
-    	return number;
+        return number;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         return o instanceof CreditCardNumber c && number.equals(c.number);

@@ -1,14 +1,26 @@
 package uo.ri.cws.domain;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 
-public class SparePart {
+@Entity
+@Table(name = "TSPAREPARTS")
+public class SparePart extends BaseEntity {
 
 	// Natural attributes
+	@Column(unique = true)
 	private String code;
 	private String description;
+	@AttributeOverride(name = "amount", column = @Column(name = "PRICE", precision = 19, scale = 2))
 	private Money unitPrice;
+
+	protected SparePart() {
+	}
 
 	public SparePart(String code) {
 		this(code, "no-description", Money.ZERO);
@@ -39,31 +51,6 @@ public class SparePart {
 
 	public Money getPrice() {
 		return unitPrice;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((code == null) ? 0 : code.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SparePart other = (SparePart) obj;
-		if (code == null) {
-			if (other.code != null)
-				return false;
-		} else if (!code.equals(other.code))
-			return false;
-		return true;
 	}
 
 	@Override
