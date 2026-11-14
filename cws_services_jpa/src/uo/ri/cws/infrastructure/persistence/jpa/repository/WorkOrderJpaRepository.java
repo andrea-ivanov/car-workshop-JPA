@@ -16,13 +16,16 @@ public class WorkOrderJpaRepository
 	public List<WorkOrder> findByIds(List<String> idsAveria) {
 		return Jpa.getManager()
 				.createNamedQuery("WorkOrder.findByIds", WorkOrder.class)
-				.setParameter( 1, idsAveria )
+				.setParameter(1, idsAveria)
 				.getResultList();
-		}
+	}
 
 	@Override
 	public List<WorkOrder> findNotInvoicedByClientNif(Nif nif) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		return Jpa.getManager()
+				.createNamedQuery("WorkOrder.findNotInvoicedByClientNif", WorkOrder.class)
+				.setParameter(1, nif)
+				.getResultList();
 	}
 
 }
