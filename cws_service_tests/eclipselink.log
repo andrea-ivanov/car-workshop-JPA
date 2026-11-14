@@ -1,0 +1,6 @@
+[EL Info]: 2026.11.14 13:52:44.011--ServerSession(1229511404)--EclipseLink, version: Eclipse Persistence Services - 5.0.0.v202603230926-bc4f4eb36eb1dcce223533d87890ba458628a2f9
+[EL Severe]: ejb: 2026.11.14 13:52:44.017--ServerSession(1229511404)--Exception [EclipseLink-0] (Eclipse Persistence Services - 5.0.0.v202603230926-bc4f4eb36eb1dcce223533d87890ba458628a2f9): org.eclipse.persistence.exceptions.JPQLException
+Exception Description: Syntax error parsing [
+			
+		]. 
+[0, 0] The query does not start with a valid identifier, has to be either SELECT, UPDATE or DELETE FROM. ( [  ] ...

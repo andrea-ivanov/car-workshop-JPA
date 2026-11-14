@@ -8,9 +8,13 @@ import java.util.Optional;
 import uo.ri.conf.Factories;
 import uo.ri.cws.application.service.invoice.InvoicingService;
 import uo.ri.cws.application.service.invoice.create.commands.CreateInvoiceFor;
+import uo.ri.cws.application.service.invoice.create.commands.FindInvoiceByNumber;
 import uo.ri.cws.application.service.invoice.create.commands.FindNotInvoicedWorkOrdersByClientNif;
+import uo.ri.cws.application.service.invoice.create.commands.FindPayMeansByClientNif;
+import uo.ri.cws.application.service.invoice.create.commands.SettleInvoice;
 import uo.ri.cws.application.util.command.CommandExecutor;
 import uo.ri.util.exception.BusinessException;
+import uo.ri.util.exception.NotYetImplementedException;
 
 public class InvoicingServiceImpl implements InvoicingService {
 
@@ -23,7 +27,7 @@ public class InvoicingServiceImpl implements InvoicingService {
 
 	@Override
 	public List<InvoicingWorkOrderDto> findWorkOrdersByClientNif(String nif) throws BusinessException {
-		throw new UnsupportedOperationException("Not yet implemented");
+		throw new NotYetImplementedException("Not yet implemented");
 	}
 
 	@Override
@@ -33,22 +37,22 @@ public class InvoicingServiceImpl implements InvoicingService {
 
 	@Override
 	public List<InvoicingWorkOrderDto> findWorkOrdersByPlateNumber(String plate) throws BusinessException {
-		throw new UnsupportedOperationException("Not yet implemented");
+		throw new NotYetImplementedException("Not yet implemented");
 	}
 
 	@Override
 	public Optional<InvoiceDto> findInvoiceByNumber(Long number) throws BusinessException {
-		throw new UnsupportedOperationException("Not yet implemented");
+		return executor.execute(new FindInvoiceByNumber(number));
 	}
 
 	@Override
 	public List<PaymentMeanDto> findPayMeansByClientNif(String nif) throws BusinessException {
-		throw new UnsupportedOperationException("Not yet implemented");
+		return executor.execute(new FindPayMeansByClientNif(nif));
 	}
 
 	@Override
 	public void settleInvoice(String invoiceId, Map<String, BigDecimal> charges) throws BusinessException {
-		throw new UnsupportedOperationException("Not yet implemented");
+		executor.execute(new SettleInvoice(invoiceId, charges));
 	}
 
 }
