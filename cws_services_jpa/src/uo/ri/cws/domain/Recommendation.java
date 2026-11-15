@@ -1,27 +1,15 @@
 package uo.ri.cws.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.util.assertion.ArgumentChecks;
 
-@Entity
-@Table(name = "TRECOMMENDATIONS", uniqueConstraints = @UniqueConstraint(columnNames = { "RECOMMENDER_ID",
-        "RECOMMENDED_ID" }))
 public class Recommendation extends BaseEntity {
 
     // natural
-    @Column(name = "USEDFORVOUCHER")
     private boolean isUsedForVoucher;
 
     // artificial
-    @ManyToOne
     private Client recommender;
-    @OneToOne
     private Client recommended;
 
     protected Recommendation() {

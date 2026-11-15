@@ -6,23 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.cws.domain.types.Money;
 import uo.ri.util.assertion.ArgumentChecks;
 import uo.ri.util.assertion.StateChecks;
 
-@Entity
-@Table(name = "TWORKORDERS", uniqueConstraints = @UniqueConstraint(columnNames = { "DATE", "VEHICLE_ID" }))
 public class WorkOrder extends BaseEntity {
 
     public enum WorkOrderState {
@@ -36,20 +24,14 @@ public class WorkOrder extends BaseEntity {
     // Natural attributes
     private LocalDateTime date;
     private String description;
-    @AttributeOverride(name = "amount", column = @Column(name = "TOTAL_AMOUNT", precision = 19, scale = 2))
     private Money amount = Money.ZERO; // cents
-    @Enumerated(EnumType.STRING)
     private WorkOrderState state = WorkOrderState.OPEN;
     private boolean usedForVoucher;
 
     // Accidental attributes
-    @ManyToOne
     private Invoice invoice;
-    @ManyToOne
     private Mechanic mechanic;
-    @ManyToOne
     private Vehicle vehicle;
-    @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Intervention> interventions = new HashSet<>();
 
     // ---- Constructors ----
