@@ -13,7 +13,6 @@ import uo.ri.cws.domain.types.Nif;
 import uo.ri.cws.domain.types.VoucherCode;
 import uo.ri.cws.infrastructure.persistence.jpa.util.BaseJpaRepository;
 import uo.ri.cws.infrastructure.persistence.jpa.util.Jpa;
-import uo.ri.util.exception.NotYetImplementedException;
 
 public class PaymentMeanJpaRepository extends BaseJpaRepository<PaymentMean> implements PaymentMeanRepository {
 
@@ -35,12 +34,22 @@ public class PaymentMeanJpaRepository extends BaseJpaRepository<PaymentMean> imp
 
 	@Override
 	public Optional<Voucher> findVoucherByCode(VoucherCode code) {
-		throw new NotYetImplementedException("Unimplemented method 'findVoucherByCode'");
+		return Jpa.getManager()
+				.createNamedQuery("PaymentMean.findVoucherByCode", Voucher.class)
+				.setParameter(1, code)
+				.getResultList()
+				.stream()
+				.findFirst();
 	}
 
 	@Override
 	public Optional<CreditCard> findCreditCardByNumber(CreditCardNumber number) {
-		throw new NotYetImplementedException("Unimplemented method 'findCreditCardByNumber'");
+		return Jpa.getManager()
+				.createNamedQuery("PaymentMean.findCreditCardByNumber", CreditCard.class)
+				.setParameter(1, number)
+				.getResultList()
+				.stream()
+				.findFirst();
 	}
 
 	@Override

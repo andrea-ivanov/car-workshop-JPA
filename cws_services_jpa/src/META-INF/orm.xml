@@ -5,11 +5,81 @@
 	version="3.1">
 
 	<!-- Client queries -->
+	<named-query name="Client.countPaidInvoices">
+		<query>
+			select count(distinct i)
+			from Invoice i
+			where i.state = uo.ri.cws.domain.Invoice.InvoiceState.PAID
+				and (
+					exists (
+						select ch
+						from Charge ch
+						where ch.invoice = i
+							and ch.paymentMean.client.id = ?1
+					)
+					or exists (
+						select w
+						from WorkOrder w
+						where w.invoice = i
+							and w.vehicle.client.id = ?1
+					)
+				)
+		</query>
+	</named-query>
 	<named-query name="Client.findByNif">
 		<query>
 			select c
 			from Client c
 			where c.nif = ?1
+		</query>
+	</named-query>
+	<named-query name="Client.findRecommendedBy">
+		<query>
+			select r.recommended
+			from Recommendation r
+			where r.recommender.nif = ?1
+		</query>
+	</named-query>
+	<named-query name="Client.findWithRecommendationsUnusedForVoucher">
+		<query>
+			<![CDATA[ 
+			select c
+			from Client c
+			where exists (
+				select w
+				from WorkOrder w
+				where w.vehicle.client = c
+					and w.state = uo.ri.cws.domain.WorkOrder.WorkOrderState.INVOICED
+					and w.invoice.state = uo.ri.cws.domain.Invoice.InvoiceState.PAID)
+			and (
+				select count(r)
+				from Recommendation r
+				where r.recommender = c
+					and r.isUsedForVoucher = false
+					and exists (
+						select w2
+						from WorkOrder w2
+						where w2.vehicle.client = r.recommended
+							and w2.state = uo.ri.cws.domain.WorkOrder.WorkOrderState.INVOICED
+							and w2.invoice.state = uo.ri.cws.domain.Invoice.InvoiceState.PAID))
+			>= ?1
+			]]>
+		</query>
+	</named-query>
+	<named-query name="Client.findWithWorkOrdersUnusedForVoucher">
+		<query>
+			<![CDATA[ 
+			select c
+			from Client c
+			where (
+				select count(w)
+				from WorkOrder w
+				where w.vehicle.client = c
+					and w.state = uo.ri.cws.domain.WorkOrder.WorkOrderState.INVOICED
+					and w.invoice.state = uo.ri.cws.domain.Invoice.InvoiceState.PAID
+					and w.usedForVoucher = false
+			) >= ?1
+			]]>
 		</query>
 	</named-query>
 
@@ -36,6 +106,7 @@
 			from Invoice invoice
 			where invoice.total.amount > ?1
 				and invoice.usedForVoucher = false
+				and invoice.state = uo.ri.cws.domain.Invoice.InvoiceState.PAID
 			]]>
 		</query>
 	</named-query>
@@ -58,6 +129,20 @@
 	</named-query>
 
 	<!-- PaymentMean queries -->
+	<named-query name="PaymentMean.countCharges">
+		<query>
+			select count(ch)
+			from Charge ch
+			where ch.paymentMean.id = ?1
+		</query>
+	</named-query>
+	<named-query name="PaymentMean.findCreditCardByNumber">
+		<query>
+			select cc
+			from CreditCard cc
+			where cc.number = ?1
+		</query>
+	</named-query>
 	<named-query name="PaymentMean.findByIds">
 		<query>
 			select p
@@ -65,12 +150,18 @@
 			where p.id in ?1
 		</query>
 	</named-query>
-
 	<named-query name="PaymentMean.findByNif">
 		<query>
 			select pm
 			from PaymentMean pm
 			where pm.client.nif = ?1
+		</query>
+	</named-query>
+	<named-query name="PaymentMean.findVoucherByCode">
+		<query>
+			select v
+			from Voucher v
+			where v.code = ?1
 		</query>
 	</named-query>
 
@@ -82,7 +173,24 @@
 	<!-- Voucher queries-->
 	<named-query name="Voucher.findByClientNif">
 		<query>
-			<!-- TODO-->
+			select v
+			from Voucher v
+			where v.client.nif = ?1
+		</query>
+	</named-query>
+	<named-query name="Voucher.getSummary">
+		<query>
+			select c.nif.nif, 
+					c.fullName.name, 
+					c.fullName.surname, 
+					count(v),
+					sum(v.availableAmount.amount) + sum(v.accumulated.amount),
+					sum(v.availableAmount.amount),
+					sum(v.accumulated.amount)
+			from Voucher v
+			join v.client c
+			group by c.id, c.nif.nif, c.fullName.name, c.fullName.surname 
+			order by sum(v.availableAmount.amount) desc
 		</query>
 	</named-query>
 

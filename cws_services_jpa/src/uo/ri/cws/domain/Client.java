@@ -209,4 +209,18 @@ public class Client extends BaseEntity {
 		for (int i = 0; i < 3; i++)
 			availables.get(i).markAsUsedForVoucher();
 	}
+
+	public void update(Nif nif, FullName fullName, Email email, PhoneNumber phoneNumber, Address address) {
+		ArgumentChecks.isNotNull(nif, "El nif no puede ser nulo");
+		ArgumentChecks.isNotNull(fullName, "El nombre no puede ser nulo");
+		ArgumentChecks.isNotNull(email, "El email no puede ser nulo");
+		ArgumentChecks.isNotNull(phoneNumber, "El numero de telefono no puede ser nulo");
+		ArgumentChecks.isNotNull(address, "La dirección no puede ser nula");
+		this.nif = nif;
+		this.fullName = fullName;
+		this.email = email;
+		this.phone = phoneNumber;
+		this.address = address;
+		updatedNow();
+	}
 }

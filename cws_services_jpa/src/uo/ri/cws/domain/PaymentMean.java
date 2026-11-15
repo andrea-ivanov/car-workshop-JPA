@@ -85,4 +85,13 @@ public abstract class PaymentMean extends BaseEntity {
 		return result;
 	}
 
+	/**
+	 * Diferencia qué tipo de métodos de pago pueden ser eliminados, en aquellos que
+	 * no puedan serlo se sobreescribe este método a false.
+	 * 
+	 * @return
+	 */
+	public boolean canBeDeleted() {
+		return true;
+	}
 }

@@ -31,4 +31,14 @@ public class Cash extends PaymentMean {
 		return "Cash [accumulated=" + getAccumulated() + "]";
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * Este método no se puede eliminar
+	 * 
+	 * @see uo.ri.cws.domain.PaymentMean#canBeDeleted()
+	 */
+	@Override
+	public boolean canBeDeleted() {
+		return false;
+	}
 }

@@ -6,6 +6,7 @@ import uo.ri.conf.Factories;
 import uo.ri.cws.application.service.paymentmean.VoucherGenerationService;
 import uo.ri.cws.application.service.paymentmean.voucher.commands.FindVouchersByClientNif;
 import uo.ri.cws.application.service.paymentmean.voucher.commands.GenerateVouchers;
+import uo.ri.cws.application.service.paymentmean.voucher.commands.GetVoucherSummary;
 import uo.ri.cws.application.util.command.CommandExecutor;
 import uo.ri.util.exception.BusinessException;
 
@@ -25,8 +26,7 @@ public class VoucherGenerationServiceImpl implements VoucherGenerationService {
 
     @Override
     public List<VoucherSummaryDto> getVoucherSummary() throws BusinessException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getVoucherSummary'");
+        return executor.execute(new GetVoucherSummary());
     }
 
 }
